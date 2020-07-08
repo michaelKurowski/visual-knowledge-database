@@ -1,7 +1,7 @@
 
 const LEVELS_DISTANCE = 250
 const FIRST_LEVEL_NODES = 5
-const FIRST_LEVEL_NODE_SIZE = 10
+const FIRST_LEVEL_NODE_SIZE = 30
 const LINE_WIDTH = 2
 const LINE_OPACITY = 0.5
 const MAX_CHILDREN = 5
@@ -23,13 +23,14 @@ const layer = new Konva.Layer();
 const parent = new Konva.Circle({
     x: centerX,
     y: centerY,
-    radius: 20,
+    radius: FIRST_LEVEL_NODE_SIZE,
     fill: 'red',
     stroke: 'black',
     strokeWidth: CIRCLE_BORDER_WIDTH,
 });
 parent.on('click', handleClick({x: centerX, y: centerY}))
 
+// Draws only first level of nodes
 for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
 
     const childDegree = (i / FIRST_LEVEL_NODES) * Math.PI * 2
@@ -117,7 +118,7 @@ function drawLevel({
         })
         const child = new Konva.Circle({
             ...childPosition,
-            radius: 5,
+            radius: FIRST_LEVEL_NODE_SIZE,
             fill: 'red',
             stroke: 'black',
             strokeWidth: CIRCLE_BORDER_WIDTH
@@ -174,12 +175,20 @@ function pointAlongCircle({
 function isEven(number) {
     return number % 2 === 0
 }
-
+/*
 function handleClick(nodeCoordinates) {
     return () => {
-        console.log(layer)
-        layer.offsetX(nodeCoordinates.x - centerX)
-        layer.offsetY(nodeCoordinates.y - centerY)
-        layer.draw()
+        const anim = new Konva.Animation(function (frame) {
+            if ((Math.abs(layer.offsetX() - (nodeCoordinates.x - centerX)) < 100) &&
+            (Math.abs(layer.offsetY() - (nodeCoordinates.y - centerY)) < 100 )) {
+                return
+            }
+
+            layer.offsetX((nodeCoordinates.x - centerX) * (frame.time / 1000))
+            layer.offsetY((nodeCoordinates.y - centerY) * (frame.time / 1000))
+
+          }, layer);
+        anim.start()
     }
 }
+*/
