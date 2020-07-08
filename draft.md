@@ -20,3 +20,6 @@ because of duplicates.
  - Moderator account
    - Ability to verify added content
  - Should have tags, what kind of speciallist He is
+## Adding new content
+ - A view enabling fast navigation along the graph without animations etc. for people adding content
+ - Multiple convinent ways of adding content
