@@ -70,7 +70,15 @@ for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
 }
 // add the shape to the layer
 layer.add(parent);
-
+var grayBezierLine = new Konva.Line({
+    points: [50, 50, 100, 100, 150, 50, 200, 100, 250, 50, 300, 100, 350, 50],
+    stroke: 'red',
+    strokeWidth: 15,
+    lineCap: 'round',
+    lineJoin: 'round',
+    bezier: true,
+  });
+  layer.add(grayBezierLine);
 // add the layer to the stage
 stage.add(layer);
 
@@ -83,6 +91,14 @@ function drawLevel({
 }) {
     let i = countOfChildren
     const offset = !isEven(countOfChildren) ?  - (1/10) : 0
+    const centralPoint = pointAlongCircle({
+        position: {
+            x: centerX,
+            y: centerY
+        },
+        size: LEVELS_DISTANCE * (levelDepth - 0.5),
+        degree: parentDegree
+    })
     while (i--) {
         
         const degree = isEven(i) ? parentDegree + i / 10 : parentDegree - (i - 1) / 10
@@ -95,13 +111,20 @@ function drawLevel({
             size: LEVELS_DISTANCE * levelDepth,
             degree: countOfChildren === 1 ? parentDegree : degree + offset
         })
+        const childCentralPoint = pointAlongCircle({
+            position: {
+                x: centerX,
+                y: centerY
+            },
+            size: LEVELS_DISTANCE * (levelDepth - 0.5),
+            degree: countOfChildren === 1 ? parentDegree : degree + offset
+        })
         const child = new Konva.Circle({
             ...childPosition,
             radius: 5,
             fill: 'red',
             stroke: 'black',
-            strokeWidth: 4,
-            bezier: true
+            strokeWidth: 4
         });
     
         var bezierLinePath = new Konva.Line({
@@ -110,13 +133,19 @@ function drawLevel({
             lineCap: 'round',
             id: 'bezierLinePath',
             opacity: 0.3,
+            lineCap: 'round',
+            lineJoin: 'round',
+            bezier: true,
             points: [
                 parentPosition.x,
                 parentPosition.y,
+                centralPoint.x,
+                centralPoint.y,
+                childCentralPoint.x,
+                childCentralPoint.y,
                 childPosition.x,
                 childPosition.y,
-                parentPosition.x,
-                parentPosition.y
+                
             ],
         });
         layer.add(bezierLinePath);
