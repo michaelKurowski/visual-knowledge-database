@@ -1,7 +1,11 @@
 
-const LEVELS_DISTANCE = 120
-const FIRST_LEVEL_NODES = 10
+const LEVELS_DISTANCE = 250
+const FIRST_LEVEL_NODES = 5
 const FIRST_LEVEL_NODE_SIZE = 10
+const LINE_WIDTH = 2
+const LINE_OPACITY = 0.5
+const MAX_CHILDREN = 5
+const CIRCLE_BORDER_WIDTH = 2
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -22,14 +26,13 @@ const parent = new Konva.Circle({
     radius: 20,
     fill: 'red',
     stroke: 'black',
-    strokeWidth: 4,
+    strokeWidth: CIRCLE_BORDER_WIDTH,
 });
+parent.on('click', handleClick({x: centerX, y: centerY}))
 
-
-let i = 30
 for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
 
-    const childDegree = (i / 10) * Math.PI * 2
+    const childDegree = (i / FIRST_LEVEL_NODES) * Math.PI * 2
     const childPosition = pointAlongCircle({
         position: {
             x: centerX,
@@ -43,19 +46,20 @@ for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
         radius: FIRST_LEVEL_NODE_SIZE,
         fill: 'red',
         stroke: 'black',
-        strokeWidth: 4,
+        strokeWidth: CIRCLE_BORDER_WIDTH,
         bezier: true
     });
+    child.on('click', handleClick(childPosition))
 
     var bezierLinePath = new Konva.Line({
-        strokeWidth: 3,
+        strokeWidth: LINE_WIDTH,
         stroke: 'silver',
         lineCap: 'round',
         id: 'bezierLinePath',
-        opacity: 0.3,
+        opacity: LINE_OPACITY,
         points: [centerX, centerY, childPosition.x, childPosition.y, centerX, centerY],
       });
-    const countOfChildren = Math.round(Math.random() * 5)
+    const countOfChildren = Math.round(Math.random() * MAX_CHILDREN)
     if (countOfChildren) {
         drawLevel({
             levelDepth: 2,
@@ -70,15 +74,6 @@ for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
 }
 // add the shape to the layer
 layer.add(parent);
-var grayBezierLine = new Konva.Line({
-    points: [50, 50, 100, 100, 150, 50, 200, 100, 250, 50, 300, 100, 350, 50],
-    stroke: 'red',
-    strokeWidth: 15,
-    lineCap: 'round',
-    lineJoin: 'round',
-    bezier: true,
-  });
-  layer.add(grayBezierLine);
 // add the layer to the stage
 stage.add(layer);
 
@@ -101,7 +96,8 @@ function drawLevel({
     })
     while (i--) {
         
-        const degree = isEven(i) ? parentDegree + i / 10 : parentDegree - (i - 1) / 10
+        const nextStepDegree = isEven(i) ? parentDegree + i / 10 : parentDegree - (i - 1) / 10
+        const degree = countOfChildren === 1 ? parentDegree : nextStepDegree + offset
         console.log(countOfChildren, i, offset, degree + offset)
         const childPosition = pointAlongCircle({
             position: {
@@ -109,7 +105,7 @@ function drawLevel({
                 y: centerY
             },
             size: LEVELS_DISTANCE * levelDepth,
-            degree: countOfChildren === 1 ? parentDegree : degree + offset
+            degree
         })
         const childCentralPoint = pointAlongCircle({
             position: {
@@ -117,22 +113,22 @@ function drawLevel({
                 y: centerY
             },
             size: LEVELS_DISTANCE * (levelDepth - 0.5),
-            degree: countOfChildren === 1 ? parentDegree : degree + offset
+            degree: countOfChildren === 1 ? parentDegree : nextStepDegree + offset
         })
         const child = new Konva.Circle({
             ...childPosition,
             radius: 5,
             fill: 'red',
             stroke: 'black',
-            strokeWidth: 4
+            strokeWidth: CIRCLE_BORDER_WIDTH
         });
     
+        child.on('click', handleClick(childPosition))
         var bezierLinePath = new Konva.Line({
-            strokeWidth: 2,
+            strokeWidth: LINE_WIDTH,
             stroke: 'silver',
-            lineCap: 'round',
             id: 'bezierLinePath',
-            opacity: 0.3,
+            opacity: LINE_OPACITY,
             lineCap: 'round',
             lineJoin: 'round',
             bezier: true,
@@ -148,6 +144,17 @@ function drawLevel({
                 
             ],
         });
+        if (Math.random() < 0.2) {
+            const countOfChildren = Math.round(Math.random() * MAX_CHILDREN)
+            if (countOfChildren) {
+                drawLevel({
+                    levelDepth: levelDepth + 1,
+                    countOfChildren,
+                    parentPosition: childPosition,
+                    parentDegree: degree
+                })
+            }
+        }
         layer.add(bezierLinePath);
         layer.add(child);
     }
@@ -166,4 +173,13 @@ function pointAlongCircle({
 
 function isEven(number) {
     return number % 2 === 0
+}
+
+function handleClick(nodeCoordinates) {
+    return () => {
+        console.log(layer)
+        layer.offsetX(nodeCoordinates.x - centerX)
+        layer.offsetY(nodeCoordinates.y - centerY)
+        layer.draw()
+    }
 }
