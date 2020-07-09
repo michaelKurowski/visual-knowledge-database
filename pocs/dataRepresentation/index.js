@@ -175,9 +175,13 @@ function pointAlongCircle({
 function isEven(number) {
     return number % 2 === 0
 }
-/*
+
 function handleClick(nodeCoordinates) {
     return () => {
+        layer.offsetX(nodeCoordinates.x - centerX)
+        layer.offsetY(nodeCoordinates.y - centerY)
+        layer.draw()
+        /*
         const anim = new Konva.Animation(function (frame) {
             if ((Math.abs(layer.offsetX() - (nodeCoordinates.x - centerX)) < 100) &&
             (Math.abs(layer.offsetY() - (nodeCoordinates.y - centerY)) < 100 )) {
@@ -189,6 +193,7 @@ function handleClick(nodeCoordinates) {
 
           }, layer);
         anim.start()
+
+        */
     }
 }
-*/
