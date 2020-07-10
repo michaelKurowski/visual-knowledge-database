@@ -3,9 +3,10 @@ const LEVELS_DISTANCE = 250
 const FIRST_LEVEL_NODES = 5
 const FIRST_LEVEL_NODE_SIZE = 30
 const LINE_WIDTH = 2
-const LINE_OPACITY = 0.5
+const LINE_OPACITY = 0.2
 const MAX_CHILDREN = 5
 const CIRCLE_BORDER_WIDTH = 2
+const CIRCLE_BORDER_COLOR = 'rgba(255,255,255,0.3)'
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -25,7 +26,7 @@ const parent = new Konva.Circle({
     y: centerY,
     radius: FIRST_LEVEL_NODE_SIZE,
     fill: 'red',
-    stroke: 'black',
+    stroke: CIRCLE_BORDER_COLOR,
     strokeWidth: CIRCLE_BORDER_WIDTH,
 });
 
@@ -38,6 +39,19 @@ let moveAnimationDirection = null
 let animationTarget = null
 let animationDistance = null
 
+/*
+
+fetch('./knowledgeNetwork.json')
+    .then(reponse => response.json())
+    .then(knowledgeNetwork => {
+        drawLevel({
+            levelDepth,
+            countOfChildren,
+            parentPosition,
+            parentDegree
+        })
+    })
+*/
 // Draws only first level of nodes
 for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
 
@@ -54,7 +68,7 @@ for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
         ...childPosition,
         radius: FIRST_LEVEL_NODE_SIZE,
         fill: 'red',
-        stroke: 'black',
+        stroke: CIRCLE_BORDER_COLOR,
         strokeWidth: CIRCLE_BORDER_WIDTH,
         bezier: true
     });
@@ -128,7 +142,7 @@ function drawLevel({
             ...childPosition,
             radius: FIRST_LEVEL_NODE_SIZE,
             fill: 'red',
-            stroke: 'black',
+            stroke: CIRCLE_BORDER_COLOR,
             strokeWidth: CIRCLE_BORDER_WIDTH
         });
     
@@ -265,7 +279,7 @@ function moveViewTo(to, speed = 1) {
     moveAnimation.start()
 }
 
-function mapDistanceToAnimationSpeed(distanceFromBeginning, animationDistance, baseSpeed = 0.1) {
+function mapDistanceToAnimationSpeed(distanceFromBeginning, animationDistance, baseSpeed = 0.2) {
     const distanceTravelledRatio = distanceFromBeginning/animationDistance
     const sinRatio = Math.PI * distanceTravelledRatio
     return Math.sin(sinRatio) + baseSpeed
