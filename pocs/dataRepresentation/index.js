@@ -36,6 +36,7 @@ let currentCoordinates = {x: centerX, y: centerY}
 let moveAnimation = null
 let moveAnimationDirection = null
 let animationTarget = null
+let animationDistance = null
 
 // Draws only first level of nodes
 for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
@@ -208,7 +209,7 @@ function handleClick(nodeCoordinates) {
     }
 }
 
-// TODO ease-in-out
+
 function moveViewTo(to, speed = 1) {
     moveAnimationDirection = getUnitVectorFromAToB(
         currentCoordinates.x,
@@ -217,13 +218,24 @@ function moveViewTo(to, speed = 1) {
         to.y
     )
     animationTarget = to
+    animationDistance = calculateDistance(
+        currentCoordinates.x,
+        currentCoordinates.y,
+        to.x,
+        to.y
+    )
+
     moveAnimation = new Konva.Animation(function (frame) {
-        const moveLength = frame.timeDiff * speed
+
         const distanceToTarget = calculateDistance(
             currentCoordinates.x,
             currentCoordinates.y,
             to.x,
             to.y
+        )
+        const moveLength = frame.timeDiff * speed * mapDistanceToAnimationSpeed(
+            animationDistance - distanceToTarget,
+            animationDistance
         )
 
         if (distanceToTarget < moveLength) {
@@ -251,6 +263,12 @@ function moveViewTo(to, speed = 1) {
 
       }, layer);
     moveAnimation.start()
+}
+
+function mapDistanceToAnimationSpeed(distanceFromBeginning, animationDistance, baseSpeed = 0.1) {
+    const distanceTravelledRatio = distanceFromBeginning/animationDistance
+    const sinRatio = Math.PI * distanceTravelledRatio
+    return Math.sin(sinRatio) + baseSpeed
 }
 
 function setCurrentCoordinates(position) {
