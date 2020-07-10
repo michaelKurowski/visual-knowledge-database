@@ -1,7 +1,7 @@
 
-const LEVELS_DISTANCE = 250
+const LEVELS_DISTANCE = 300
 const FIRST_LEVEL_NODES = 5
-const FIRST_LEVEL_NODE_SIZE = 30
+const FIRST_LEVEL_NODE_SIZE = 40
 const LINE_WIDTH = 2
 const LINE_OPACITY = 0.2
 const MAX_CHILDREN = 5
@@ -39,67 +39,64 @@ let moveAnimationDirection = null
 let animationTarget = null
 let animationDistance = null
 
-/*
-
+/* THIS WILL BE RENDERING FROM DUMMY DATA
 fetch('./knowledgeNetwork.json')
     .then(reponse => response.json())
     .then(knowledgeNetwork => {
-        drawLevel({
-            levelDepth,
-            countOfChildren,
-            parentPosition,
-            parentDegree
-        })
+        // TODO render network from dummy data
     })
 */
-// Draws only first level of nodes
-for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
 
-    const childDegree = (i / FIRST_LEVEL_NODES) * Math.PI * 2
-    const childPosition = pointAlongCircle({
-        position: {
-            x: centerX,
-            y: centerY
-        },
-        size: LEVELS_DISTANCE,
-        degree: childDegree
-    })
-    const child = new Konva.Circle({
-        ...childPosition,
-        radius: FIRST_LEVEL_NODE_SIZE,
-        fill: 'red',
-        stroke: CIRCLE_BORDER_COLOR,
-        strokeWidth: CIRCLE_BORDER_WIDTH,
-        bezier: true
-    });
-    child.on('click', handleClick(childPosition))
-
-    var bezierLinePath = new Konva.Line({
-        strokeWidth: LINE_WIDTH,
-        stroke: 'silver',
-        lineCap: 'round',
-        id: 'bezierLinePath',
-        opacity: LINE_OPACITY,
-        points: [centerX, centerY, childPosition.x, childPosition.y, centerX, centerY],
-      });
-    const countOfChildren = Math.round(Math.random() * MAX_CHILDREN)
-    if (countOfChildren) {
-        drawLevel({
-            levelDepth: 2,
-            countOfChildren,
-            parentPosition: childPosition,
-            parentDegree: childDegree
-        })
-    }
-
-    layer.add(bezierLinePath);
-    layer.add(child);
-}
-// add the shape to the layer
-layer.add(parent);
-// add the layer to the stage
+drawBranches()
 stage.add(layer);
 
+
+function drawBranches() {
+    for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
+
+        const childDegree = (i / FIRST_LEVEL_NODES) * Math.PI * 2
+        const childPosition = pointAlongCircle({
+            position: {
+                x: centerX,
+                y: centerY
+            },
+            size: LEVELS_DISTANCE,
+            degree: childDegree
+        })
+        const child = new Konva.Circle({
+            ...childPosition,
+            radius: FIRST_LEVEL_NODE_SIZE,
+            fill: 'red',
+            stroke: CIRCLE_BORDER_COLOR,
+            strokeWidth: CIRCLE_BORDER_WIDTH,
+            bezier: true
+        });
+        child.on('click', handleClick(childPosition))
+    
+        var bezierLinePath = new Konva.Line({
+            strokeWidth: LINE_WIDTH,
+            stroke: 'silver',
+            lineCap: 'round',
+            id: 'bezierLinePath',
+            opacity: LINE_OPACITY,
+            points: [centerX, centerY, childPosition.x, childPosition.y, centerX, centerY],
+          });
+        const countOfChildren = Math.round(Math.random() * MAX_CHILDREN)
+        if (countOfChildren) {
+            drawLevel({
+                levelDepth: 2,
+                countOfChildren,
+                parentPosition: childPosition,
+                parentDegree: childDegree
+            })
+        }
+    
+        layer.add(bezierLinePath);
+        layer.add(child);
+    }
+    // add the shape to the layer
+    layer.add(parent);
+}
 
 function drawLevel({
     levelDepth,
@@ -121,7 +118,6 @@ function drawLevel({
         
         const nextStepDegree = isEven(i) ? parentDegree + i / 10 : parentDegree - (i - 1) / 10
         const degree = countOfChildren === 1 ? parentDegree : nextStepDegree + offset
-        console.log(countOfChildren, i, offset, degree + offset)
         const childPosition = pointAlongCircle({
             position: {
                 x: centerX,
@@ -199,28 +195,7 @@ function isEven(number) {
 }
 
 function handleClick(nodeCoordinates) {
-    return () => {
-        moveViewTo(nodeCoordinates)
-        /*
-        layer.offsetX(nodeCoordinates.x - centerX)
-        layer.offsetY(nodeCoordinates.y - centerY)
-        layer.draw()
-        */
-        /*
-        const anim = new Konva.Animation(function (frame) {
-            if ((Math.abs(layer.offsetX() - (nodeCoordinates.x - centerX)) < 100) &&
-            (Math.abs(layer.offsetY() - (nodeCoordinates.y - centerY)) < 100 )) {
-                return
-            }
-
-            layer.offsetX((nodeCoordinates.x - centerX) * (frame.time / 1000))
-            layer.offsetY((nodeCoordinates.y - centerY) * (frame.time / 1000))
-
-          }, layer);
-        anim.start()
-
-        */
-    }
+    return () => moveViewTo(nodeCoordinates)
 }
 
 
