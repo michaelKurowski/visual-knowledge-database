@@ -179,20 +179,7 @@ function drawLevel({
     }
 }
 
-function pointAlongCircle({
-    position,
-    size,
-    degree
-}) {
-    return {
-        x: size * Math.sin(degree) + position.x,
-        y: size * Math.cos(degree) + position.y
-    }
-}
 
-function isEven(number) {
-    return number % 2 === 0
-}
 
 function handleClick(nodeCoordinates) {
     return () => moveViewTo(nodeCoordinates)
@@ -265,6 +252,23 @@ function setCurrentCoordinates(position) {
         x: position.x + centerX,
         y: position.y + centerY
     }
+}
+
+// MATH UTILITY FUNCTIONS
+
+function pointAlongCircle({
+    position,
+    size,
+    degree
+}) {
+    return {
+        x: size * Math.sin(degree) + position.x,
+        y: size * Math.cos(degree) + position.y
+    }
+}
+
+function isEven(number) {
+    return number % 2 === 0
 }
 
 function calculateDistance(aX, aY, bX, bY) {
