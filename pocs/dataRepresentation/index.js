@@ -208,7 +208,7 @@ function handleClick(nodeCoordinates) {
     }
 }
 
-
+// TODO ease-in-out
 function moveViewTo(to, speed = 1) {
     moveAnimationDirection = getUnitVectorFromAToB(
         currentCoordinates.x,
@@ -217,12 +217,6 @@ function moveViewTo(to, speed = 1) {
         to.y
     )
     animationTarget = to
-    /*
-    if (moveAnimation) {
-        moveAnimation.start()
-        return
-    }
-    */
     moveAnimation = new Konva.Animation(function (frame) {
         const moveLength = frame.timeDiff * speed
         const distanceToTarget = calculateDistance(
