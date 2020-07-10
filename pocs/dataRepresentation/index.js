@@ -28,7 +28,14 @@ const parent = new Konva.Circle({
     stroke: 'black',
     strokeWidth: CIRCLE_BORDER_WIDTH,
 });
+
 parent.on('click', handleClick({x: centerX, y: centerY}))
+
+
+let currentCoordinates = {x: centerX, y: centerY}
+let moveAnimation = null
+let moveAnimationDirection = null
+let animationTarget = null
 
 // Draws only first level of nodes
 for (let i = 0 ; i <= FIRST_LEVEL_NODES ; i++) {
@@ -178,9 +185,12 @@ function isEven(number) {
 
 function handleClick(nodeCoordinates) {
     return () => {
+        moveViewTo(nodeCoordinates)
+        /*
         layer.offsetX(nodeCoordinates.x - centerX)
         layer.offsetY(nodeCoordinates.y - centerY)
         layer.draw()
+        */
         /*
         const anim = new Konva.Animation(function (frame) {
             if ((Math.abs(layer.offsetX() - (nodeCoordinates.x - centerX)) < 100) &&
@@ -196,4 +206,90 @@ function handleClick(nodeCoordinates) {
 
         */
     }
+}
+
+
+function moveViewTo(to, speed = 1) {
+    moveAnimationDirection = getUnitVectorFromAToB(
+        currentCoordinates.x,
+        currentCoordinates.y,
+        to.x,
+        to.y
+    )
+    animationTarget = to
+    /*
+    if (moveAnimation) {
+        moveAnimation.start()
+        return
+    }
+    */
+    moveAnimation = new Konva.Animation(function (frame) {
+        const moveLength = frame.timeDiff * speed
+        const distanceToTarget = calculateDistance(
+            currentCoordinates.x,
+            currentCoordinates.y,
+            to.x,
+            to.y
+        )
+
+        if (distanceToTarget < moveLength) {
+            setCurrentCoordinates({
+                x: to.x - centerX,
+                y: to.y - centerY
+            })
+            layer.offsetX(currentCoordinates.x - centerX)
+            layer.offsetY(currentCoordinates.y - centerY)
+            moveAnimation.stop()
+            return
+        }
+
+        const moveVector = {
+            x: moveAnimationDirection.x * moveLength,
+            y: moveAnimationDirection.y * moveLength
+        }
+
+        setCurrentCoordinates({
+            x: currentCoordinates.x - centerX + moveVector.x,
+            y: currentCoordinates.y - centerY + moveVector.y
+        })
+        layer.offsetX(currentCoordinates.x - centerX)
+        layer.offsetY(currentCoordinates.y - centerY)
+
+      }, layer);
+    moveAnimation.start()
+}
+
+function setCurrentCoordinates(position) {
+    currentCoordinates = {
+        x: position.x + centerX,
+        y: position.y + centerY
+    }
+}
+
+function calculateDistance(aX, aY, bX, bY) {
+    const xDifference = Math.abs(aX - bX)
+    const yDifference = Math.abs(aY - bY)
+    const pythagorasASquared = xDifference ? xDifference ** 2 : 0
+    const pythagorasBSquared = yDifference ? yDifference ** 2 : 0
+    return Math.sqrt(pythagorasASquared + pythagorasBSquared)
+ }
+
+function getUnitVectorFromAToB(aX, aY, bX, bY) {
+    const vector = getVectorFromAToB(aX, aY, bX, bY) 
+    return convertVectorToUnitVector(vector.x, vector.y)
+ }
+
+ function convertVectorToUnitVector(x, y) {
+    const length = calculateDistance(0, 0, x, y)
+    const proportionToScaleDown = 1 / length
+    return {
+        x: x * proportionToScaleDown,
+        y: y * proportionToScaleDown
+    }
+ }
+
+ function getVectorFromAToB(aX, aY, bX, bY) {
+    const xDifference = bX - aX
+    const yDifference = bY - aY
+    return {x: xDifference, y: yDifference}
 }
