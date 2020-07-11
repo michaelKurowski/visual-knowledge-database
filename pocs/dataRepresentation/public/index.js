@@ -61,11 +61,12 @@ function drawTree(rootNode) {
         y: centerY + 50,
         align: 'center'
     })
-    layer.add(rootCircle)
-    layer.add(rootCaption)
+
     if (rootNode.parent)
         rootCircle.on('click', handleClick(rootNode.parent, {x: centerX, y: centerY}))
     drawBranches(rootNode, true)
+    layer.add(rootCircle)
+    layer.add(rootCaption)
     layer.draw()
 }
 
