@@ -3,7 +3,7 @@ const LEVELS_DISTANCE = 300
 const FIRST_LEVEL_NODES = 5
 const FIRST_LEVEL_NODE_SIZE = 40
 const LINE_WIDTH = 3
-const LINE_OPACITY = 1
+const LINE_OPACITY = 0.5
 const LINE_COLOR = '#afafaf'
 
 
