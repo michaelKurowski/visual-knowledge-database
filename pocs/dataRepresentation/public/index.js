@@ -8,6 +8,7 @@ const MAX_CHILDREN = 5
 const CIRCLE_BORDER_WIDTH = 2
 const CIRCLE_BORDER_COLOR = 'rgba(255,255,255,0.3)'
 const CHILDREN_SPREAD_FACTOR = 1.2
+const MAX_LEVEL_DEPTH = 2
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -125,6 +126,7 @@ function drawLevel({
     parentPosition,
     parentDegree
 }) {
+    
     const countOfChildren = node.children.length
     const offset = !isEven(countOfChildren) ?  - (1/10) : 0
     const centralPoint = pointAlongCircle({
@@ -158,23 +160,45 @@ function drawLevel({
             size: LEVELS_DISTANCE * (levelDepth - 0.5),
             degree: countOfChildren === 1 ? parentDegree : nextStepDegree + offset
         })
-        const childCaption = new Konva.Text({
-            text: childNode.name + ' ' + levelDepth,
-            fill: 'white',
-            x: childPosition.x - (childNode.name.length * 3.5),
-            y: childPosition.y + 50,
-            align: 'center'
-        })
-        const child = new Konva.Circle({
-            ...childPosition,
-            radius: FIRST_LEVEL_NODE_SIZE,
-            fill: 'red',
-            stroke: CIRCLE_BORDER_COLOR,
-            strokeWidth: CIRCLE_BORDER_WIDTH
-        });
-    
-        child.on('click', handleClick(childNode, childPosition))
-        var bezierLinePath = new Konva.Line({
+       
+        if (levelDepth === MAX_LEVEL_DEPTH + 1) {
+            const bezierLinePath = new Konva.Line({
+                strokeWidth: LINE_WIDTH,
+                id: 'bezierLinePath',
+                opacity: LINE_OPACITY,
+                lineCap: 'round',
+                lineJoin: 'round',
+                bezier: true,
+                strokeLinearGradientStartPoint: {
+                    x: centerX,
+                    y: centerY
+                },
+                strokeLinearGradientEndPoint: {
+                    x: childPosition.x,
+                    y: childPosition.y
+                },
+                strokeLinearGradientColorStops: [
+                    0,
+                    'silver',
+                    1,
+                    'black'
+                ],
+                points: [
+                    parentPosition.x,
+                    parentPosition.y,
+                    centralPoint.x,
+                    centralPoint.y,
+                    childCentralPoint.x,
+                    childCentralPoint.y,
+                    childPosition.x,
+                    childPosition.y,
+                    
+                ],
+            });
+            layer.add(bezierLinePath);
+            continue
+        }
+        const bezierLinePath = new Konva.Line({
             strokeWidth: LINE_WIDTH,
             stroke: 'silver',
             id: 'bezierLinePath',
@@ -194,6 +218,24 @@ function drawLevel({
                 
             ],
         });
+        layer.add(bezierLinePath);
+        const childCaption = new Konva.Text({
+            text: childNode.name + ' ' + levelDepth,
+            fill: 'white',
+            x: childPosition.x - (childNode.name.length * 3.5),
+            y: childPosition.y + 50,
+            align: 'center'
+        })
+        const child = new Konva.Circle({
+            ...childPosition,
+            radius: FIRST_LEVEL_NODE_SIZE,
+            fill: 'red',
+            stroke: CIRCLE_BORDER_COLOR,
+            strokeWidth: CIRCLE_BORDER_WIDTH
+        });
+    
+        child.on('click', handleClick(childNode, childPosition))
+
         for (let subChild of childNode.children) {
             drawLevel({
                 levelDepth: levelDepth + 1,
@@ -203,7 +245,7 @@ function drawLevel({
             })
         }
         layer.add(childCaption)
-        layer.add(bezierLinePath);
+        
         layer.add(child);
         
     }
