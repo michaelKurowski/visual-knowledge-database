@@ -3,12 +3,19 @@ const LEVELS_DISTANCE = 300
 const FIRST_LEVEL_NODES = 5
 const FIRST_LEVEL_NODE_SIZE = 40
 const LINE_WIDTH = 2
-const LINE_OPACITY = 0.2
+const LINE_OPACITY = 1
+const LINE_COLOR = '#333333'
+
+
+
 const MAX_CHILDREN = 5
-const CIRCLE_BORDER_WIDTH = 2
-const CIRCLE_BORDER_COLOR = 'rgba(255,255,255,0.3)'
+const CIRCLE_BORDER_WIDTH = 3
+const CIRCLE_BORDER_COLOR = '#222222'
+const CIRCLE_FILL_COLOR = '#bb1111'
 const CHILDREN_SPREAD_FACTOR = 1.2
 const MAX_LEVEL_DEPTH = 2
+
+
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -51,7 +58,7 @@ function drawTree(rootNode) {
         x: centerX,
         y: centerY,
         radius: FIRST_LEVEL_NODE_SIZE,
-        fill: 'red',
+        fill: CIRCLE_FILL_COLOR,
         stroke: CIRCLE_BORDER_COLOR,
         strokeWidth: CIRCLE_BORDER_WIDTH,
     });
@@ -86,10 +93,11 @@ function drawBranches(rootNode) {
         const child = new Konva.Circle({
             ...childPosition,
             radius: FIRST_LEVEL_NODE_SIZE,
-            fill: 'red',
+            fill: CIRCLE_FILL_COLOR,
             stroke: CIRCLE_BORDER_COLOR,
             strokeWidth: CIRCLE_BORDER_WIDTH,
-            bezier: true
+            bezier: true,
+            strokeWidth: 2
         });
         child.on('click', handleClick(childrenNode, childPosition))
         const childCaption = new Konva.Text({
@@ -102,7 +110,7 @@ function drawBranches(rootNode) {
     
         var bezierLinePath = new Konva.Line({
             strokeWidth: LINE_WIDTH,
-            stroke: 'silver',
+            stroke: LINE_COLOR,
             lineCap: 'round',
             id: 'bezierLinePath',
             opacity: LINE_OPACITY,
@@ -170,8 +178,8 @@ function drawLevel({
                 lineJoin: 'round',
                 bezier: true,
                 strokeLinearGradientStartPoint: {
-                    x: centerX,
-                    y: centerY
+                    x: parentPosition.x,
+                    y: parentPosition.y
                 },
                 strokeLinearGradientEndPoint: {
                     x: childPosition.x,
@@ -179,9 +187,9 @@ function drawLevel({
                 },
                 strokeLinearGradientColorStops: [
                     0,
-                    'silver',
+                    LINE_COLOR,
                     1,
-                    'black'
+                    'rgba(0,0,0,0)'
                 ],
                 points: [
                     parentPosition.x,
@@ -200,7 +208,7 @@ function drawLevel({
         }
         const bezierLinePath = new Konva.Line({
             strokeWidth: LINE_WIDTH,
-            stroke: 'silver',
+            stroke: LINE_COLOR,
             id: 'bezierLinePath',
             opacity: LINE_OPACITY,
             lineCap: 'round',
@@ -229,7 +237,7 @@ function drawLevel({
         const child = new Konva.Circle({
             ...childPosition,
             radius: FIRST_LEVEL_NODE_SIZE,
-            fill: 'red',
+            fill: CIRCLE_FILL_COLOR,
             stroke: CIRCLE_BORDER_COLOR,
             strokeWidth: CIRCLE_BORDER_WIDTH
         });
