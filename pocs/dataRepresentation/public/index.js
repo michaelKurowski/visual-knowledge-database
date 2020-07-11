@@ -89,14 +89,12 @@ function drawBranches(rootNode) {
             opacity: LINE_OPACITY,
             points: [centerX, centerY, childPosition.x, childPosition.y, centerX, centerY],
           });
-        for (let subChild of childrenNode.children) {
-            drawLevel({
-                levelDepth: 2,
-                node: subChild,
-                parentPosition: childPosition,
-                parentDegree: childDegree
-            })
-        }
+        drawLevel({
+            levelDepth: 2,
+            node: childrenNode,
+            parentPosition: childPosition,
+            parentDegree: childDegree
+        })
         layer.add(bezierLinePath);
         layer.add(childCaption)
         layer.add(child);
@@ -111,7 +109,6 @@ function drawLevel({
     parentPosition,
     parentDegree
 }) {
-    
     const countOfChildren = node.children.length
     const offset = !isEven(countOfChildren) ?  - (1/10) : 0
     const centralPoint = pointAlongCircle({
@@ -122,11 +119,12 @@ function drawLevel({
         size: LEVELS_DISTANCE * (levelDepth - 0.5),
         degree: parentDegree
     })
-
+    
     for (let i = 0 ; i < countOfChildren ; i++) {
         
         const childNode = node.children[i]
-        const nextStepDegree = isEven(i) ? parentDegree + i / 10 : parentDegree - (i - 1) / 10
+        const spreadStep = i + 1
+        const nextStepDegree = isEven(i) ? parentDegree + spreadStep / 10 : parentDegree - (spreadStep - 1) / 10
         const degree = countOfChildren === 1 ? parentDegree : nextStepDegree + offset
         const childPosition = pointAlongCircle({
             position: {
@@ -145,7 +143,7 @@ function drawLevel({
             degree: countOfChildren === 1 ? parentDegree : nextStepDegree + offset
         })
         const childCaption = new Konva.Text({
-            text: childNode.name,
+            text: childNode.name + ' ' + levelDepth,
             fill: 'white',
             x: childPosition.x - (childNode.name.length * 3.5),
             y: childPosition.y + 50,
@@ -180,15 +178,14 @@ function drawLevel({
                 
             ],
         });
-        if (childNode.children.length) {
-            for (let subChild of childNode.children) {
-                drawLevel({
-                    levelDepth: levelDepth + 1,
-                    node: subChild,
-                    parentPosition: childPosition,
-                    parentDegree: degree
-                })
-            }
+
+        for (let subChild of childNode.children) {
+            drawLevel({
+                levelDepth: levelDepth + 1,
+                node: subChild,
+                parentPosition: childPosition,
+                parentDegree: degree
+            })
         }
         layer.add(childCaption)
         layer.add(bezierLinePath);
