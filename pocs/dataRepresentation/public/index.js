@@ -4,16 +4,17 @@ const FIRST_LEVEL_NODES = 5
 const FIRST_LEVEL_NODE_SIZE = 40
 const LINE_WIDTH = 3
 const LINE_OPACITY = 1
-const LINE_COLOR = '#333333'
+const LINE_COLOR = '#afafaf'
 
 
 
 const MAX_CHILDREN = 5
-const CIRCLE_BORDER_WIDTH = 3
-const CIRCLE_BORDER_COLOR = '#222222'
-const CIRCLE_FILL_COLOR = '#bb1111'
+const CIRCLE_BORDER_WIDTH = 0
+const CIRCLE_BORDER_COLOR = '#afafaf'
+const CIRCLE_FILL_COLOR = '#dd2727'
 const CHILDREN_SPREAD_FACTOR = 1.2
 const MAX_LEVEL_DEPTH = 2
+const TEXT_COLOR = '#dd2727'
 
 
 
@@ -64,10 +65,11 @@ function drawTree(rootNode) {
     });
     const rootCaption = new Konva.Text({
         text: rootNode.name,
-        fill: 'white',
+        fill: TEXT_COLOR,
         x: centerX - (rootNode.name.length * 3.5),
         y: centerY + 50,
-        align: 'center'
+        align: 'center',
+        fontStyle: 'bold'
     })
 
     if (rootNode.parent)
@@ -96,16 +98,16 @@ function drawBranches(rootNode) {
             fill: CIRCLE_FILL_COLOR,
             stroke: CIRCLE_BORDER_COLOR,
             strokeWidth: CIRCLE_BORDER_WIDTH,
-            bezier: true,
-            strokeWidth: 2
+            bezier: true
         });
         child.on('click', handleClick(childrenNode, childPosition))
         const childCaption = new Konva.Text({
             text: childrenNode.name,
-            fill: 'white',
+            fill: TEXT_COLOR,
             x: childPosition.x - (childrenNode.name.length * 3.5),
             y: childPosition.y + 50,
-            align: 'center'
+            align: 'center',
+            fontStyle: 'bold'
         })
     
         var bezierLinePath = new Konva.Line({
@@ -189,7 +191,7 @@ function drawLevel({
                     0,
                     LINE_COLOR,
                     1,
-                    'rgba(0,0,0,0)'
+                    'rgba(66,71,79,0)'
                 ],
                 points: [
                     parentPosition.x,
@@ -229,10 +231,11 @@ function drawLevel({
         layer.add(bezierLinePath);
         const childCaption = new Konva.Text({
             text: childNode.name + ' ' + levelDepth,
-            fill: 'white',
+            fill: TEXT_COLOR,
             x: childPosition.x - (childNode.name.length * 3.5),
             y: childPosition.y + 50,
-            align: 'center'
+            align: 'center',
+            fontStyle: 'bold'
         })
         const child = new Konva.Circle({
             ...childPosition,
