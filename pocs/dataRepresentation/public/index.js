@@ -7,6 +7,7 @@ const LINE_OPACITY = 0.2
 const MAX_CHILDREN = 5
 const CIRCLE_BORDER_WIDTH = 2
 const CIRCLE_BORDER_COLOR = 'rgba(255,255,255,0.3)'
+const CHILDREN_SPREAD_FACTOR = 1.2
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -21,18 +22,9 @@ const stage = new Konva.Stage({
 });
 const layer = new Konva.Layer();
 
-const parent = new Konva.Circle({
-    x: centerX,
-    y: centerY,
-    radius: FIRST_LEVEL_NODE_SIZE,
-    fill: 'red',
-    stroke: CIRCLE_BORDER_COLOR,
-    strokeWidth: CIRCLE_BORDER_WIDTH,
-});
-
-parent.on('click', handleClick({x: centerX, y: centerY}))
 
 
+let clickedNode = null
 let currentCoordinates = {x: centerX, y: centerY}
 let moveAnimation = null
 let moveAnimationDirection = null
@@ -43,16 +35,41 @@ fetch('./knowledgeNetwork.json')
     .then(response => response.json())
     .then(knowledgeNetwork => {
         // TODO render network from dummy data
-        console.log(knowledgeNetwork)
-        drawBranches(knowledgeNetwork, true)
-        layer.draw()
+        //console.log(knowledgeNetwork)
+        stage.add(layer);
+        assignParents(knowledgeNetwork)
+        drawTree(knowledgeNetwork)
     })
 
-stage.add(layer);
 
+
+
+function drawTree(rootNode) {
+    layer.destroyChildren()
+    const rootCircle = new Konva.Circle({
+        x: centerX,
+        y: centerY,
+        radius: FIRST_LEVEL_NODE_SIZE,
+        fill: 'red',
+        stroke: CIRCLE_BORDER_COLOR,
+        strokeWidth: CIRCLE_BORDER_WIDTH,
+    });
+    const rootCaption = new Konva.Text({
+        text: rootNode.name,
+        fill: 'white',
+        x: centerX - (rootNode.name.length * 3.5),
+        y: centerY + 50,
+        align: 'center'
+    })
+    layer.add(rootCircle)
+    layer.add(rootCaption)
+    if (rootNode.parent)
+        rootCircle.on('click', handleClick(rootNode.parent, {x: centerX, y: centerY}))
+    drawBranches(rootNode, true)
+    layer.draw()
+}
 
 function drawBranches(rootNode) {
-
     for (let i = 0 ; i < rootNode.children.length ; i++) {
         const childrenNode = rootNode.children[i]
         const childDegree = (i / rootNode.children.length) * Math.PI * 2
@@ -72,7 +89,7 @@ function drawBranches(rootNode) {
             strokeWidth: CIRCLE_BORDER_WIDTH,
             bezier: true
         });
-        child.on('click', handleClick(childPosition))
+        child.on('click', handleClick(childrenNode, childPosition))
         const childCaption = new Konva.Text({
             text: childrenNode.name,
             fill: 'white',
@@ -99,8 +116,6 @@ function drawBranches(rootNode) {
         layer.add(childCaption)
         layer.add(child);
     }
-    // add the shape to the layer
-    layer.add(parent);
 }
 
 function drawLevel({
@@ -119,12 +134,12 @@ function drawLevel({
         size: LEVELS_DISTANCE * (levelDepth - 0.5),
         degree: parentDegree
     })
-    
     for (let i = 0 ; i < countOfChildren ; i++) {
-        
         const childNode = node.children[i]
-        const spreadStep = i + 1
-        const nextStepDegree = isEven(i) ? parentDegree + spreadStep / 10 : parentDegree - (spreadStep - 1) / 10
+        const spreadIterator = isEven(i) ? i : i - 1 
+        const spreadStep =
+            ((spreadIterator * CHILDREN_SPREAD_FACTOR) + 1) / (((levelDepth - 1) * LEVELS_DISTANCE) / 300)
+        const nextStepDegree = isEven(i) ? parentDegree + spreadStep / 10 : parentDegree - spreadStep / 10
         const degree = countOfChildren === 1 ? parentDegree : nextStepDegree + offset
         const childPosition = pointAlongCircle({
             position: {
@@ -157,7 +172,7 @@ function drawLevel({
             strokeWidth: CIRCLE_BORDER_WIDTH
         });
     
-        child.on('click', handleClick(childPosition))
+        child.on('click', handleClick(childNode, childPosition))
         var bezierLinePath = new Konva.Line({
             strokeWidth: LINE_WIDTH,
             stroke: 'silver',
@@ -178,7 +193,6 @@ function drawLevel({
                 
             ],
         });
-
         for (let subChild of childNode.children) {
             drawLevel({
                 levelDepth: levelDepth + 1,
@@ -190,17 +204,17 @@ function drawLevel({
         layer.add(childCaption)
         layer.add(bezierLinePath);
         layer.add(child);
+        
     }
 }
 
-
-
-function handleClick(nodeCoordinates) {
-    return () => moveViewTo(nodeCoordinates)
+function handleClick(node, parentNode, nodeCoordinates) {
+    return () => moveViewTo(node, parentNode, nodeCoordinates)
 }
 
 
-function moveViewTo(to, speed = 1) {
+function moveViewTo(node, to, speed = 1) {
+    
     moveAnimationDirection = getUnitVectorFromAToB(
         currentCoordinates.x,
         currentCoordinates.y,
@@ -214,6 +228,11 @@ function moveViewTo(to, speed = 1) {
         to.x,
         to.y
     )
+    if (!animationDistance) {
+        console.log('drawTree', node)
+        drawTree(node)
+        return
+    }
 
     moveAnimation = new Konva.Animation(function (frame) {
 
@@ -229,13 +248,15 @@ function moveViewTo(to, speed = 1) {
         )
 
         if (distanceToTarget < moveLength) {
-            setCurrentCoordinates({
-                x: to.x - centerX,
-                y: to.y - centerY
-            })
-            layer.offsetX(currentCoordinates.x - centerX)
-            layer.offsetY(currentCoordinates.y - centerY)
             moveAnimation.stop()
+            drawTree(node)
+            setCurrentCoordinates({
+                x: 0,
+                y: 0
+            })
+            layer.offsetX(0)
+            layer.offsetY(0)
+            
             return
         }
 
@@ -266,6 +287,12 @@ function setCurrentCoordinates(position) {
         x: position.x + centerX,
         y: position.y + centerY
     }
+}
+
+function assignParents(node, parent = null) {
+    node.parent = parent
+
+    node.children.forEach(child => assignParents(child, node))
 }
 
 // MATH UTILITY FUNCTIONS
