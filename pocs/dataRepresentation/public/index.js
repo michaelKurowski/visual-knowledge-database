@@ -73,6 +73,13 @@ function drawBranches(rootNode) {
             bezier: true
         });
         child.on('click', handleClick(childPosition))
+        const childCaption = new Konva.Text({
+            text: childrenNode.name,
+            fill: 'white',
+            x: childPosition.x - (childrenNode.name.length * 3.5),
+            y: childPosition.y + 50,
+            align: 'center'
+        })
     
         var bezierLinePath = new Konva.Line({
             strokeWidth: LINE_WIDTH,
@@ -91,6 +98,7 @@ function drawBranches(rootNode) {
             })
         }
         layer.add(bezierLinePath);
+        layer.add(childCaption)
         layer.add(child);
     }
     // add the shape to the layer
@@ -136,7 +144,13 @@ function drawLevel({
             size: LEVELS_DISTANCE * (levelDepth - 0.5),
             degree: countOfChildren === 1 ? parentDegree : nextStepDegree + offset
         })
-        console.log(node,childPosition)
+        const childCaption = new Konva.Text({
+            text: childNode.name,
+            fill: 'white',
+            x: childPosition.x - (childNode.name.length * 3.5),
+            y: childPosition.y + 50,
+            align: 'center'
+        })
         const child = new Konva.Circle({
             ...childPosition,
             radius: FIRST_LEVEL_NODE_SIZE,
@@ -176,6 +190,7 @@ function drawLevel({
                 })
             }
         }
+        layer.add(childCaption)
         layer.add(bezierLinePath);
         layer.add(child);
     }
