@@ -497,13 +497,14 @@ function moveViewTo(node, to, speed = 1) {
                     }, MOVE_DURATION * 1000)
                     return
                 }
-                drawTree(node)
+                
                 setCurrentCoordinates({
                     x: 0,
                     y: 0
                 })
                 layer.offsetX(0)
                 layer.offsetY(0)
+                drawTree(node)
             })
             //drawTree(node)
             /*
