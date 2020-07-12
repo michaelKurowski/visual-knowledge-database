@@ -140,7 +140,7 @@ function drawTree(rootNode, redraw = false) {
     }
 
     if (rootNode.parent)
-        rootCircle.on('click', handleClick(rootNode.parent, {x: centerX, y: centerY}))
+        rootCircle.on('click tap', handleClick(rootNode.parent, {x: centerX, y: centerY}))
     drawBranches(rootNode, redraw)
     layer.add(rootCircle)
     layer.add(rootCaption)
@@ -213,7 +213,7 @@ function drawBranches(rootNode, redraw = false) {
             stroke: CIRCLE_BORDER_COLOR,
             strokeWidth: CIRCLE_BORDER_WIDTH
         });
-        child.on('click', handleClick(childrenNode, childPosition))
+        child.on('click tap', handleClick(childrenNode, childPosition))
         const childCaption = new Konva.Text({
             ...captionPosition,
             text: childrenNode.name,
@@ -404,7 +404,7 @@ function drawLevel({
             caption: childCaption,
             bezier: bezierLinePath
         }
-        child.on('click', handleClick(childNode, childPosition))
+        child.on('click tap', handleClick(childNode, childPosition))
 
         for (let subChild of childNode.children) {
             drawLevel({
@@ -478,21 +478,32 @@ function moveViewTo(node, to, speed = 1) {
         if (distanceToTarget < moveLength) {
             moveAnimation.stop()
             hideAncestorNodes(node, node, () => {
-                drawTree(node, true)
-                layer.to({
-                    offsetX: 0,
-                    offsetY: 0,
-                    duration: MOVE_DURATION,
-                    easing: Konva.Easings.EaseInOut
-                })
+                const areChildrenRendered = !!node.children[0].konva
+                
+                if (areChildrenRendered) {
+                    drawTree(node, true)
+                    layer.to({
+                        offsetX: 0,
+                        offsetY: 0,
+                        duration: MOVE_DURATION,
+                        easing: Konva.Easings.EaseInOut
+                    })
+                    setCurrentCoordinates({
+                        x: 0,
+                        y: 0
+                    })
+                    setTimeout(() => {
+                        drawTree(node)
+                    }, MOVE_DURATION * 1000)
+                    return
+                }
+                drawTree(node)
                 setCurrentCoordinates({
                     x: 0,
                     y: 0
                 })
-                setTimeout(() => {
-                    drawTree(node)
-                }, MOVE_DURATION * 1000)
-                
+                layer.offsetX(0)
+                layer.offsetY(0)
             })
             //drawTree(node)
             /*
