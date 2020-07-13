@@ -9,7 +9,7 @@ passport.use(new GoogleStrategy({
 }, (accessToken, refreshToken, profile, done) => {
     //check if user already exists in our db with the given profile id
     const loginRegister = require('../account/loginRegister')
-    loginRegister(profile, done)
+    loginRegister(accessToken, profile, done)
 }))
 
 passport.serializeUser((user, done) => {

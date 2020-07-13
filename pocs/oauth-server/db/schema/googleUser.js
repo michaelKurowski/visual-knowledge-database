@@ -20,7 +20,7 @@ const googleUserSchema = new Schema({
     }
 }, {timestamps: true})
 
-userSchema.plugin(uniqueValidator, {message: 'DUPLICATE KEY ERROR'})
+googleUserSchema.plugin(uniqueValidator, {message: 'DUPLICATE KEY ERROR'})
 const GoogleUserModel = dbConnection.model('googleUser', googleUserSchema)
 
 module.exports = GoogleUserModel

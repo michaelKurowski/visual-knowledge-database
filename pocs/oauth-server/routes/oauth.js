@@ -6,7 +6,7 @@ router.get('/', (req, res) => {
     res.render('home', {user: req.user})
 })
 
-app.get('/logout', (req, res) => {
+router.get('/logout', (req, res) => {
     req.logout()
     res.send(req.user)
 })
