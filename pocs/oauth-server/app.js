@@ -22,6 +22,8 @@ app.get('/logout', (req, res) => {
     req.logout()
     res.send(req.user)
 })
-//app.use('/', router)
+
+//Use OAuth routes
+app.use('/', require('./routes/oauth'))
 
 app.listen(PORT, () => console.log('Server is listening on:', PORT))
