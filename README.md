@@ -1,1 +1,1 @@
-# visual-knowledge-base
+# visual-knowledge-database
