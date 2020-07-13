@@ -13,16 +13,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static('public'))
 
-app.get('/', (req, res) => {
-    res.render('home', {user: req.user})
-})
-
-app.get('/auth/google', passport.authenticate('google', {scope: ['profile, email']}))
-app.get('/logout', (req, res) => {
-    req.logout()
-    res.send(req.user)
-})
-
 //Use OAuth routes
 app.use('/', require('./routes/oauth'))
 
