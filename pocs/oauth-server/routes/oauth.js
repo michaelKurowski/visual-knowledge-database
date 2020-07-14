@@ -11,11 +11,15 @@ router.get('/logout', (req, res) => {
     res.send(req.user)
 })
 
-router.get('/auth/google', passport.authenticate('google', {scope: ['profile, email']}))
+router.get('/auth/google', passport.authenticate('google', {
+    scope: [
+        'https://www.googleapis.com/auth/plus.login',
+        'https://www.googleapis.com/auth/userinfo.email'
+    ]
+}))
 
-router.get("auth/google/redirect", passport.authenticate("google"), (req,res)=>{
-    res.send(req.user)
-    res.send("you reached the redirect URI")
+router.get("/auth/google/redirect", passport.authenticate("google", {failureRedirect: '/'}), (req,res)=>{
+    res.redirect('/')
 })
 
 module.exports = router

@@ -8,17 +8,28 @@ passport.use(new GoogleStrategy({
     callbackURL: '/auth/google/redirect'
 }, (accessToken, refreshToken, profile, done) => {
     //check if user already exists in our db with the given profile id
-    const loginRegister = require('../account/loginRegister')
-    loginRegister(accessToken, profile, done)
+    GoogleUser.findOne({googleId: profile.id}).then((currentUser) => {
+        if(currentUser){
+            done(null, currentUser)
+        } else {
+            new GoogleUser({googleId: profile.id, token: accessToken, email: profile._json.email })
+            .save()
+            .then((newUser) => {
+                done(null, newUser)
+            })
+        }
+    })
 }))
 
 passport.serializeUser((user, done) => {
+    console.log('serializeUser: ' + user._id)
     done(null, user.id)
 })
 
 passport.deserializeUser((id, done) => {
     GoogleUser.findById(id).then(user => {
-      done(null, user)
+        console.log('Deserializer', user)
+        done(null, user)
     })
 })
 
