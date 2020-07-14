@@ -14,7 +14,7 @@ function prepareToken(email, VerifyModel = require('../db/schema/verify')) {
 
     instance.save()
     .then(() => mailer.sendVerificationMail(email, token))
-    .catch(console.log)
+    .catch((err) => console.error(err))
 }
 
 module.exports = prepareToken
