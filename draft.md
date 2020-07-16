@@ -23,3 +23,7 @@ because of duplicates.
 ## Adding new content
  - A view enabling fast navigation along the graph without animations etc. for people adding content
  - Multiple convinent ways of adding content
+ 
+ # Non MVP:
+ - Nodes should keep history of edits with diffs.
+ - Discussion for every node for authors, to discuss edits
