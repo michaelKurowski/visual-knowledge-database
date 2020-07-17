@@ -105,27 +105,13 @@ function drawTree(rootNode, transitionToNewDraw = false) {
         y: centerY
     }
 
-    const captionPosition = {
-        x: centerX - (rootNode.name.length * 3.5),
-        y: centerY + 50
-    }
-
     if (transitionToNewDraw) {
-        rootNode.konva.circle.to({
-            ...circlePosition,
-            duration: MOVE_DURATION,
-            easing: Konva.Easings.EaseInOut
-        })
-        rootNode.konva.caption.to({
-            ...captionPosition,
-            duration: MOVE_DURATION,
-            easing: Konva.Easings.EaseInOut
-        })
+        animateNodeToNewCoordinates(rootNode, circlePosition)
         drawBranches(rootNode, transitionToNewDraw)
         return
     }
     layer.destroyChildren()
-    drawNode(rootNode, circlePosition)
+    drawAndDecorateNode(rootNode, circlePosition)
     const rootCircle = rootNode.konva.circle
     const rootCaption = rootNode.konva.caption
 
@@ -150,49 +136,27 @@ function drawBranches(rootNode, transitionToNewDraw = false) {
             size: LEVELS_DISTANCE,
             degree: childDegree
         })
-        const captionPosition = {
-            x: childPosition.x - (childrenNode.name.length * 3.5),
-            y: childPosition.y + 50,
-        }
-        const bezierPosition = {
-            points: [centerX, centerY, childPosition.x, childPosition.y, centerX, centerY]
-        }
 
         if (transitionToNewDraw) {
-            childrenNode.konva.circle.to({
-                x: childPosition.x,
-                y: childPosition.y,
-                duration: MOVE_DURATION,
-                easing: Konva.Easings.EaseInOut
-            })
-            childrenNode.konva.caption.to({
-                ...captionPosition,
-                duration: MOVE_DURATION,
-                easing: Konva.Easings.EaseInOut
-            })
-            childrenNode.konva.bezier.to({
-                opacity: 1,
-                points: [
-                    centerX,
-                    centerY,
-                    centerX,
-                    centerY,
-                    centerX,
-                    centerY,
-                    childPosition.x,
-                    childPosition.y,
-                ],
-                duration: MOVE_DURATION,
-                easing: Konva.Easings.EaseInOut
-            })
+            const newBezierPoints = [
+                centerX,
+                centerY,
+                centerX,
+                centerY,
+                centerX,
+                centerY,
+                childPosition.x,
+                childPosition.y,
+            ]
+            animateNodeToNewCoordinates(childrenNode, childPosition, newBezierPoints)
             continue
         }
-        drawNode(childrenNode, childPosition)
+        drawAndDecorateNode(childrenNode, childPosition)
         const childCircle = childrenNode.konva.circle
         const childCaption = childrenNode.konva.caption
 
         var bezierLinePath = new Konva.Line({
-            ...bezierPosition,
+            points: [centerX, centerY, childPosition.x, childPosition.y, centerX, centerY],
             strokeWidth: LINE_WIDTH,
             stroke: LINE_COLOR,
             lineCap: 'round',
@@ -272,9 +236,7 @@ function drawLevel({
                 
             ]
         }
-        //console.log('draw level child: ', childNode.name)
         if (levelDepth === MAX_LEVEL_DEPTH + 1) {
-            //console.log('Edge Bezier', node.name, childNode.name)
             const bezierLinePath = new Konva.Line({
                 strokeWidth: LINE_WIDTH,
                 id: 'bezierLinePath',
@@ -317,21 +279,7 @@ function drawLevel({
         }
 
         if (transitionToNewDraw) {
-            node.konva.circle.to({
-                ...childPosition,
-                duration: MOVE_DURATION,
-                easing: Konva.Easings.EaseInOut
-            })
-            node.konva.bezier.to({
-                ...bezierPosition,
-                duration: MOVE_DURATION,
-                easing: Konva.Easings.EaseInOut
-            })
-            node.konva.caption.to({
-                ...captionPosition,
-                duration: MOVE_DURATION,
-                easing: Konva.Easings.EaseInOut
-            })
+            animateNodeToNewCoordinates(node, childPosition, bezierPosition)
             drawLevel({
                 levelDepth: levelDepth + 1,
                 node: childNode,
@@ -342,7 +290,7 @@ function drawLevel({
             continue
         }
 
-        drawNode(childNode, childPosition)
+        drawAndDecorateNode(childNode, childPosition)
         
         const bezierLinePath = new Konva.Line({
             ...bezierPosition,
@@ -538,8 +486,8 @@ function moveEdgeBeziersOfNodeToRootPositions(node) {
 }
 
 
-function drawNode(node, position, childNode) {
-    const circle = drawNodeCircle(position)
+function drawAndDecorateNode(node, position, childNode) {
+    const circle = drawAndDecorateNodeCircle(position)
     const caption = drawCaption(node.name, {
         x: position.x,
         y: position.y + 50
@@ -566,7 +514,7 @@ function drawCaption(text, captionCenter) {
 }
 
 
-function drawNodeCircle(circlePosition) {
+function drawAndDecorateNodeCircle(circlePosition) {
     const nodeCircle = new Konva.Circle({
         ...circlePosition,
         radius: FIRST_LEVEL_NODE_SIZE,
@@ -576,6 +524,27 @@ function drawNodeCircle(circlePosition) {
     })
     nodeCircle.transformsEnabled('position')
     return nodeCircle
+}
+
+function animateNodeToNewCoordinates(node, newPosition, bezierData = null) {
+    node.konva.circle.to({
+        ...newPosition,
+        duration: MOVE_DURATION,
+        easing: Konva.Easings.EaseInOut
+    })
+    node.konva.caption.to({
+        x: newPosition.x - (node.name.length * 3.5),
+        y: newPosition.y + 50,
+        duration: MOVE_DURATION,
+        easing: Konva.Easings.EaseInOut
+    })
+    if (bezierData) {
+        node.konva.bezier.to({
+            points: [...bezierData],
+            duration: MOVE_DURATION,
+            easing: Konva.Easings.EaseInOut
+        })
+    }
 }
 
 
