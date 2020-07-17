@@ -152,18 +152,14 @@ function drawBranches(rootNode, transitionToNewDraw = false) {
             continue
         }
         drawAndDecorateNode(childrenNode, childPosition)
-        const childCircle = childrenNode.konva.circle
-        const childCaption = childrenNode.konva.caption
-
-        var bezierLinePath = new Konva.Line({
+        childrenNode.konva.bezier = new Konva.Line({
             points: [centerX, centerY, childPosition.x, childPosition.y, centerX, centerY],
             strokeWidth: LINE_WIDTH,
             stroke: LINE_COLOR,
             lineCap: 'round',
             id: 'bezierLinePath',
             opacity: LINE_OPACITY,
-          });
-        childrenNode.konva.bezier = bezierLinePath
+          })
         drawLevel({
             levelDepth: 2,
             node: childrenNode,
@@ -171,9 +167,9 @@ function drawBranches(rootNode, transitionToNewDraw = false) {
             parentDegree: childDegree,
             transitionToNewDraw
         })
-        layer.add(bezierLinePath);
-        layer.add(childCaption)
-        layer.add(childCircle);
+        layer.add(childrenNode.konva.bezier);
+        layer.add(childrenNode.konva.caption)
+        layer.add(childrenNode.konva.circle);
     }
 }
 
@@ -219,10 +215,6 @@ function drawLevel({
             size: LEVELS_DISTANCE * (levelDepth - 0.5),
             degree: countOfChildren === 1 ? parentDegree : nextStepDegree + offset
         })
-        const captionPosition = {
-            x: childPosition.x - (childNode.name.length * 3.5),
-            y: childPosition.y + 50
-        }
         const bezierPosition = {
             points: [
                 parentPosition.x,
@@ -292,7 +284,7 @@ function drawLevel({
 
         drawAndDecorateNode(childNode, childPosition)
         
-        const bezierLinePath = new Konva.Line({
+        childNode.konva.bezier = new Konva.Line({
             ...bezierPosition,
             strokeWidth: LINE_WIDTH,
             stroke: LINE_COLOR,
@@ -302,19 +294,16 @@ function drawLevel({
             lineJoin: 'round',
             bezier: true
         });
-        childNode.konva.bezier = bezierLinePath
-        layer.add(bezierLinePath);
-        const childCircle = childNode.konva.circle
-        const childCaption = childNode.konva.caption
+        layer.add(childNode.konva.bezier);
         drawLevel({
             levelDepth: levelDepth + 1,
             node: childNode,
             parentPosition: childPosition,
             parentDegree: degree
         })
-        layer.add(childCaption)
+        layer.add(childNode.konva.caption)
         
-        layer.add(childCircle);
+        layer.add(childNode.konva.circle);
         
     }
 }
