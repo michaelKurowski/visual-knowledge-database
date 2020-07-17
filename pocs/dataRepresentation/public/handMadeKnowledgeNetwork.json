@@ -1,0 +1,52 @@
+{
+    "name": "Philosophy",
+    "children": [
+        {
+            "name": "Logic",
+            "children": [
+
+            ]
+        },
+        {
+            "name": "Metaphysics",
+            "children": [
+                {
+                    "name": "Ontology",
+                    "children": [
+        
+                    ]
+                }
+            ]
+        },
+        
+        {
+            "name": "Metaphilosophy",
+            "children": [
+
+            ]
+        },
+        {
+            "name": "Epistemiology",
+            "children": [
+
+            ]
+        },
+        {
+            "name": "Axiology",
+            "children": [
+                {
+                    "name": "Ethics",
+                    "children": [
+        
+                    ]
+                },
+                {
+                    "name": "Aescethics",
+                    "children": [
+        
+                    ]
+                }
+            ]
+        }
+    ]
+}

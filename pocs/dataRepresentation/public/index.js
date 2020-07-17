@@ -74,16 +74,25 @@ function hideDedscendantNodes(rootNode, preserveNode) {
     if (!rootNode.konva) return
     rootNode.konva.circle.to({
         opacity: 0,
-        duration: MOVE_DURATION
+        duration: MOVE_DURATION,
+        onFinish() {
+            rootNode.konva.circle.destroy()
+        }
     })
     rootNode.konva.caption.to({
         opacity: 0,
-        duration: MOVE_DURATION
+        duration: MOVE_DURATION,
+        onFinish() {
+            rootNode.konva.caption.destroy()
+        }
     })
     if (rootNode.konva.bezier) {
         rootNode.konva.bezier.to({
             opacity: 0,
-            duration: MOVE_DURATION
+            duration: MOVE_DURATION,
+            onFinish() {
+                rootNode.konva.bezier.destroy()
+            }
         })
     }
 
@@ -308,6 +317,7 @@ function drawLevel({
             ]
         }
         if (levelDepth === MAX_LEVEL_DEPTH + 1) {
+            console.log('MAX DEPTH BEZIERS')
             const bezierLinePath = new Konva.Line({
                 strokeWidth: LINE_WIDTH,
                 id: 'bezierLinePath',
@@ -478,7 +488,7 @@ function moveViewTo(node, to, speed = 1) {
         if (distanceToTarget < moveLength) {
             moveAnimation.stop()
             hideAncestorNodes(node, node, () => {
-                const areChildrenRendered = !!node.children[0].konva
+                const areChildrenRendered = node.children[0] && !!node.children[0].konva
                 
                 if (areChildrenRendered) {
                     drawTree(node, true)
