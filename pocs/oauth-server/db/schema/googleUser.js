@@ -3,11 +3,6 @@ const uniqueValidator = require('mongoose-unique-validator')
 const dbConnection = require('../dbConnectionProvider').getDbConnection()
 
 const googleUserSchema = new Schema({
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
     googleId: {
         type: String,
         required: true,
