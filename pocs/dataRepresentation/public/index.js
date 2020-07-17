@@ -125,13 +125,7 @@ function drawTree(rootNode, transitionToNewDraw = false) {
         return
     }
     layer.destroyChildren()
-    const rootCircle = new Konva.Circle({
-        ...circlePosition,
-        radius: FIRST_LEVEL_NODE_SIZE,
-        fill: CIRCLE_FILL_COLOR,
-        stroke: CIRCLE_BORDER_COLOR,
-        strokeWidth: CIRCLE_BORDER_WIDTH,
-    });
+    const rootCircle = drawNodeCircle(circlePosition)
 
     const rootCaption = drawCaption(rootNode.name, {
         x: centerX,
@@ -201,15 +195,7 @@ function drawBranches(rootNode, transitionToNewDraw = false) {
             })
             continue
         }
-        const child = new Konva.Circle({
-            ...childPosition,
-            id: rootNode.name + '-circle',
-            radius: FIRST_LEVEL_NODE_SIZE,
-            fill: CIRCLE_FILL_COLOR,
-            stroke: CIRCLE_BORDER_COLOR,
-            strokeWidth: CIRCLE_BORDER_WIDTH
-        });
-        child.transformsEnabled('position')
+        const child = drawNodeCircle(childPosition)
         child.on('click tap', handleClick(childrenNode, childPosition))
         const childCaption = drawCaption(childrenNode.name, {
             x: childPosition.x,
@@ -385,14 +371,7 @@ function drawLevel({
             x: childPosition.x,
             y: childPosition.y + 50
         })
-        const child = new Konva.Circle({
-            ...childPosition,
-            radius: FIRST_LEVEL_NODE_SIZE,
-            fill: CIRCLE_FILL_COLOR,
-            stroke: CIRCLE_BORDER_COLOR,
-            strokeWidth: CIRCLE_BORDER_WIDTH
-        });
-        child.transformsEnabled('position')
+        const child = drawNodeCircle(childPosition)
         childNode.konva = {
             circle: child,
             caption: childCaption,
@@ -592,6 +571,18 @@ function drawCaption(text, captionCenter) {
     return childCaption
 }
 
+
+function drawNodeCircle(circlePosition) {
+    const nodeCircle = new Konva.Circle({
+        ...circlePosition,
+        radius: FIRST_LEVEL_NODE_SIZE,
+        fill: CIRCLE_FILL_COLOR,
+        stroke: CIRCLE_BORDER_COLOR,
+        strokeWidth: CIRCLE_BORDER_WIDTH,
+    })
+    nodeCircle.transformsEnabled('position')
+    return nodeCircle
+}
 
 
 // MATH UTILITY FUNCTIONS
