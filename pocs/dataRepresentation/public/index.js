@@ -101,7 +101,7 @@ function hideDedscendantNodes(rootNode, preserveNode) {
 
 
 function drawTree(rootNode, redraw = false) {
-    
+    if (!redraw) edgeBeziers = []
     const circlePosition = {
         x: centerX,
         y: centerY
@@ -279,7 +279,7 @@ function drawLevel({
     //console.log('drawLevel node: ', node.name , node)
     for (let i = 0 ; i < countOfChildren ; i++) {
         const childNode = node.children[i]
-        console.log('initiating bezier', node.name, childNode.name)
+        //console.log('initiating bezier', node.name, childNode.name)
 
         const spreadIterator = isEven(i) ? i : i - 1 
         const spreadStep =
@@ -321,7 +321,7 @@ function drawLevel({
         }
         //console.log('draw level child: ', childNode.name)
         if (levelDepth === MAX_LEVEL_DEPTH + 1) {
-            console.log('Edge Bezier', node.name, childNode.name)
+            //console.log('Edge Bezier', node.name, childNode.name)
             const bezierLinePath = new Konva.Line({
                 strokeWidth: LINE_WIDTH,
                 id: 'bezierLinePath',
@@ -356,7 +356,10 @@ function drawLevel({
                 ],
             });
             layer.add(bezierLinePath);
-            edgeBeziers.push(bezierLinePath)
+            edgeBeziers.push({
+                konva: bezierLinePath,
+                parent: node
+            })
             
             continue
         }
@@ -449,14 +452,17 @@ function animateTreeSwitch(rootNode, speed = 1) {
 
 function moveViewTo(node, to, speed = 1) {
     edgeBeziers.forEach(bezier => {
-        bezier.to({
-            opacity: 0,
-            duration: MOVE_DURATION,
-            onFinish() {
-                bezier.destroy()
-            }
-        })
+        if (bezier.parent !== node) {
+            bezier.konva.to({
+                opacity: 0,
+                duration: MOVE_DURATION,
+                onFinish() {
+                    bezier.konva.destroy()
+                }
+            })
+        }
     })
+
     moveAnimationDirection = getUnitVectorFromAToB(
         currentCoordinates.x,
         currentCoordinates.y,
@@ -492,44 +498,43 @@ function moveViewTo(node, to, speed = 1) {
         
         if (distanceToTarget < moveLength) {
             moveAnimation.stop()
+            
             hideAncestorNodes(node, node, () => {
-                const areChildrenRendered = node.children[0] && !!node.children[0].konva
                 
-                if (areChildrenRendered) {
-                    drawTree(node, true)
-                    layer.to({
-                        offsetX: 0,
-                        offsetY: 0,
+                const areChildrenRendered = node.children[0] && !!node.children[0].konva
+                moveEdgeBeziersOfNodeToRootPositions(node)
+                if (areChildrenRendered) drawTree(node, true)
+                else {
+                    
+                    node.konva.circle.to({
+                        x: centerX,
+                        y: centerY,
                         duration: MOVE_DURATION,
                         easing: Konva.Easings.EaseInOut
                     })
-                    setCurrentCoordinates({
-                        x: 0,
-                        y: 0
+                    node.konva.caption.to({
+                        x: centerX - (node.name.length * 3.5),
+                        y: centerY + 50,
+                        duration: MOVE_DURATION,
+                        easing: Konva.Easings.EaseInOut
                     })
-                    setTimeout(() => {
-                        drawTree(node)
-                    }, MOVE_DURATION * 1000)
-                    return
                 }
                 
+                layer.to({
+                    offsetX: 0,
+                    offsetY: 0,
+                    duration: MOVE_DURATION,
+                    easing: Konva.Easings.EaseInOut
+                })
                 setCurrentCoordinates({
                     x: 0,
                     y: 0
                 })
-                layer.offsetX(0)
-                layer.offsetY(0)
-                drawTree(node)
+                setTimeout(() => {
+                    drawTree(node)
+                }, MOVE_DURATION * 1000)
+                   
             })
-            //drawTree(node)
-            /*
-            setCurrentCoordinates({
-                x: 0,
-                y: 0
-            })
-            layer.offsetX(0)
-            layer.offsetY(0)
-            */
             return
         }
 
@@ -566,6 +571,45 @@ function assignParents(node, parent = null) {
     node.parent = parent
 
     node.children.forEach(child => assignParents(child, node))
+}
+
+
+
+function moveEdgeBeziersOfNodeToRootPositions(node) {
+    console.log(edgeBeziers)
+    console.log(">>>moveEdgeBeziersOfNodeToRootPositions")
+    const relevelantBeziers = edgeBeziers.filter(bezier => bezier.parent === node)
+    relevelantBeziers.forEach((bezier, index) => {
+        console.log('animating bezier')
+        const childDegree = (index / node.children.length) * Math.PI * 2
+        
+        const childPosition = pointAlongCircle({
+            position: {
+                x: centerX,
+                y: centerY
+            },
+            size: LEVELS_DISTANCE,
+            degree: childDegree
+        })
+        bezier.konva.to({
+            points: [
+                centerX,
+                centerY,
+                centerX,
+                centerY,
+                centerX,
+                centerY,
+                childPosition.x,
+                childPosition.y,
+            ],
+            duration: MOVE_DURATION,
+            easing: Konva.Easings.EaseInOut,
+            onFinish() {
+                //bezier.konva.destroy()
+                edgeBeziers = []
+            }
+        })
+    })
 }
 
 // MATH UTILITY FUNCTIONS
