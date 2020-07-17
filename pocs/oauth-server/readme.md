@@ -11,3 +11,9 @@
 - SECRET_COOKIE=
 
 Mail details must be mail.com
+
+
+#### GDPR Related
+
+- Personal information stored: Google Profile ID
+- Required cookies: passport auth token
