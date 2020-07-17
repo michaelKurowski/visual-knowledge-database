@@ -191,6 +191,7 @@ function drawLevel({
         size: LEVELS_DISTANCE * (levelDepth - 0.5),
         degree: parentDegree
     })
+    const shouldDrawFadingOutBeziers = levelDepth === MAX_LEVEL_DEPTH + 1
     for (let i = 0 ; i < countOfChildren ; i++) {
         const childNode = node.children[i]
 
@@ -228,7 +229,8 @@ function drawLevel({
                 
             ]
         }
-        if (levelDepth === MAX_LEVEL_DEPTH + 1) {
+        
+        if (shouldDrawFadingOutBeziers) {
             const bezierLinePath = new Konva.Line({
                 strokeWidth: LINE_WIDTH,
                 id: 'bezierLinePath',
