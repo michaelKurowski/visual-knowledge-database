@@ -276,8 +276,11 @@ function drawLevel({
         size: LEVELS_DISTANCE * (levelDepth - 0.5),
         degree: parentDegree
     })
+    //console.log('drawLevel node: ', node.name , node)
     for (let i = 0 ; i < countOfChildren ; i++) {
         const childNode = node.children[i]
+        console.log('initiating bezier', node.name, childNode.name)
+
         const spreadIterator = isEven(i) ? i : i - 1 
         const spreadStep =
             ((spreadIterator * CHILDREN_SPREAD_FACTOR) + 1) / (((levelDepth - 1) * LEVELS_DISTANCE) / 300)
@@ -316,8 +319,9 @@ function drawLevel({
                 
             ]
         }
+        //console.log('draw level child: ', childNode.name)
         if (levelDepth === MAX_LEVEL_DEPTH + 1) {
-            console.log('MAX DEPTH BEZIERS')
+            console.log('Edge Bezier', node.name, childNode.name)
             const bezierLinePath = new Konva.Line({
                 strokeWidth: LINE_WIDTH,
                 id: 'bezierLinePath',
@@ -351,8 +355,9 @@ function drawLevel({
                     
                 ],
             });
-            edgeBeziers.push(bezierLinePath)
             layer.add(bezierLinePath);
+            edgeBeziers.push(bezierLinePath)
+            
             continue
         }
 
@@ -372,15 +377,13 @@ function drawLevel({
                 duration: MOVE_DURATION,
                 easing: Konva.Easings.EaseInOut
             })
-            for (let subChild of childNode.children) {
-                drawLevel({
-                    levelDepth: levelDepth + 1,
-                    node: subChild,
-                    parentPosition: childPosition,
-                    parentDegree: degree,
-                    redraw
-                })
-            }
+            drawLevel({
+                levelDepth: levelDepth + 1,
+                node: childNode,
+                parentPosition: childPosition,
+                parentDegree: degree,
+                redraw
+            })
             continue
         }
         const bezierLinePath = new Konva.Line({
@@ -393,6 +396,7 @@ function drawLevel({
             lineJoin: 'round',
             bezier: true
         });
+        //console.log('Normal Bezier')
         layer.add(bezierLinePath);
         const childCaption = new Konva.Text({
             ...captionPosition,
@@ -416,14 +420,12 @@ function drawLevel({
         }
         child.on('click tap', handleClick(childNode, childPosition))
 
-        for (let subChild of childNode.children) {
-            drawLevel({
-                levelDepth: levelDepth + 1,
-                node: subChild,
-                parentPosition: childPosition,
-                parentDegree: degree
-            })
-        }
+        drawLevel({
+            levelDepth: levelDepth + 1,
+            node: childNode,
+            parentPosition: childPosition,
+            parentDegree: degree
+        })
         layer.add(childCaption)
         
         layer.add(child);
@@ -449,7 +451,10 @@ function moveViewTo(node, to, speed = 1) {
     edgeBeziers.forEach(bezier => {
         bezier.to({
             opacity: 0,
-            duration: MOVE_DURATION
+            duration: MOVE_DURATION,
+            onFinish() {
+                bezier.destroy()
+            }
         })
     })
     moveAnimationDirection = getUnitVectorFromAToB(
