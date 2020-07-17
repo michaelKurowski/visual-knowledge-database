@@ -125,17 +125,9 @@ function drawTree(rootNode, transitionToNewDraw = false) {
         return
     }
     layer.destroyChildren()
-    const rootCircle = drawNodeCircle(circlePosition)
-
-    const rootCaption = drawCaption(rootNode.name, {
-        x: centerX,
-        y: centerY + 50
-    })
-    rootNode.konva = {
-        circle: rootCircle,
-        caption: rootCaption,
-        bezier: null
-    }
+    drawNode(rootNode, circlePosition)
+    const rootCircle = rootNode.konva.circle
+    const rootCaption = rootNode.konva.caption
 
     if (rootNode.parent)
         rootCircle.on('click tap', handleClick(rootNode.parent, {x: centerX, y: centerY}))
@@ -195,12 +187,9 @@ function drawBranches(rootNode, transitionToNewDraw = false) {
             })
             continue
         }
-        const child = drawNodeCircle(childPosition)
-        child.on('click tap', handleClick(childrenNode, childPosition))
-        const childCaption = drawCaption(childrenNode.name, {
-            x: childPosition.x,
-            y: childPosition.y + 50
-        })
+        drawNode(childrenNode, childPosition)
+        const childCircle = childrenNode.konva.circle
+        const childCaption = childrenNode.konva.caption
 
         var bezierLinePath = new Konva.Line({
             ...bezierPosition,
@@ -210,11 +199,7 @@ function drawBranches(rootNode, transitionToNewDraw = false) {
             id: 'bezierLinePath',
             opacity: LINE_OPACITY,
           });
-        childrenNode.konva = {
-            circle: child,
-            caption: childCaption,
-            bezier: bezierLinePath
-        }
+        childrenNode.konva.bezier = bezierLinePath
         drawLevel({
             levelDepth: 2,
             node: childrenNode,
@@ -224,7 +209,7 @@ function drawBranches(rootNode, transitionToNewDraw = false) {
         })
         layer.add(bezierLinePath);
         layer.add(childCaption)
-        layer.add(child);
+        layer.add(childCircle);
     }
 }
 
@@ -356,6 +341,9 @@ function drawLevel({
             })
             continue
         }
+
+        drawNode(childNode, childPosition)
+        
         const bezierLinePath = new Konva.Line({
             ...bezierPosition,
             strokeWidth: LINE_WIDTH,
@@ -366,19 +354,10 @@ function drawLevel({
             lineJoin: 'round',
             bezier: true
         });
+        childNode.konva.bezier = bezierLinePath
         layer.add(bezierLinePath);
-        const childCaption = drawCaption(childNode.name, {
-            x: childPosition.x,
-            y: childPosition.y + 50
-        })
-        const child = drawNodeCircle(childPosition)
-        childNode.konva = {
-            circle: child,
-            caption: childCaption,
-            bezier: bezierLinePath
-        }
-        child.on('click tap', handleClick(childNode, childPosition))
-
+        const childCircle = childNode.konva.circle
+        const childCaption = childNode.konva.caption
         drawLevel({
             levelDepth: levelDepth + 1,
             node: childNode,
@@ -387,13 +366,13 @@ function drawLevel({
         })
         layer.add(childCaption)
         
-        layer.add(child);
+        layer.add(childCircle);
         
     }
 }
 
-function handleClick(node, parentNode, nodeCoordinates) {
-    return () => moveViewTo(node, parentNode, nodeCoordinates)
+function handleClick(node, parentNode) {
+    return () => moveViewTo(node, parentNode)
 }
 
 function moveViewTo(node, to, speed = 1) {
@@ -556,6 +535,21 @@ function moveEdgeBeziersOfNodeToRootPositions(node) {
             }
         })
     })
+}
+
+
+function drawNode(node, position, childNode) {
+    const circle = drawNodeCircle(position)
+    const caption = drawCaption(node.name, {
+        x: position.x,
+        y: position.y + 50
+    })
+    circle.on('click tap', handleClick(node, position))
+    node.konva = {
+        circle,
+        caption,
+        bezier: null
+    }
 }
 
 function drawCaption(text, captionCenter) {
