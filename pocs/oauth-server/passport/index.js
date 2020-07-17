@@ -11,7 +11,7 @@ passport.use(new GoogleStrategy({
         if(currentUser){
             done(null, currentUser)
         } else {
-            new GoogleUser({googleId: profile.id, token: accessToken, email: profile._json.email })
+            new GoogleUser({googleId: profile.id, token: accessToken, consent: true})
             .save()
             .then((newUser) => {
                 done(null, newUser)

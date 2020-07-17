@@ -12,6 +12,10 @@ const googleUserSchema = new Schema({
         type: String,
         required: true,
         unique: true
+    },
+    consent: {
+        type: Boolean,
+        required: true
     }
 }, {timestamps: true})
 
