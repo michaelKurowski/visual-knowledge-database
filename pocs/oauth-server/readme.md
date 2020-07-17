@@ -12,6 +12,12 @@
 
 Mail details must be mail.com
 
+#### Current API functionality
+
+| Path | Variables | Method |
+|---|---|---|
+|/account/registration|method: String <br> consent: Boolean|POST|
+
 
 #### GDPR Related
 
