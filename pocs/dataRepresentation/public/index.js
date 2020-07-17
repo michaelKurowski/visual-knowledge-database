@@ -222,6 +222,7 @@ function drawBranches(rootNode, redraw = false) {
             stroke: CIRCLE_BORDER_COLOR,
             strokeWidth: CIRCLE_BORDER_WIDTH
         });
+        child.transformsEnabled('position')
         child.on('click tap', handleClick(childrenNode, childPosition))
         const childCaption = new Konva.Text({
             ...captionPosition,
@@ -232,6 +233,7 @@ function drawBranches(rootNode, redraw = false) {
             fontStyle: 'bold'
         })
 
+        child.transformsEnabled('position')
         var bezierLinePath = new Konva.Line({
             ...bezierPosition,
             strokeWidth: LINE_WIDTH,
@@ -408,6 +410,7 @@ function drawLevel({
             align: 'center',
             fontStyle: 'bold'
         })
+        childCaption.transformsEnabled('position')
         const child = new Konva.Circle({
             ...childPosition,
             radius: FIRST_LEVEL_NODE_SIZE,
@@ -415,7 +418,7 @@ function drawLevel({
             stroke: CIRCLE_BORDER_COLOR,
             strokeWidth: CIRCLE_BORDER_WIDTH
         });
-    
+        child.transformsEnabled('position')
         childNode.konva = {
             circle: child,
             caption: childCaption,
