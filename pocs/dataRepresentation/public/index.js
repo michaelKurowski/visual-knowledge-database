@@ -182,76 +182,14 @@ function drawLevel({
 }) {
     
     const countOfChildren = node.children.length
-    const offset = !isEven(countOfChildren) ?  - (1/10) : 0
-    const midPointBetweenParentAndFirstChild = pointAlongCircle({
-        position: {
-            x: centerX,
-            y: centerY
-        },
-        size: LEVELS_DISTANCE * (levelDepth - 0.5),
-        degree: parentDegree
-    })
     const shouldDrawFadingOutBeziers = levelDepth === MAX_LEVEL_DEPTH + 1
     for (let i = 0 ; i < countOfChildren ; i++) {
         const childNode = node.children[i]
-        const spreadIterator = isEven(i) ? i : i - 1 
-        const spreadStep =
-            ((spreadIterator * CHILDREN_SPREAD_FACTOR) + 1) / (((levelDepth - 1) * LEVELS_DISTANCE) / 300)
-        const nextStepDegree = isEven(i) ? parentDegree + spreadStep / 10 : parentDegree - spreadStep / 10
-        const childDegree = countOfChildren === 1 ? parentDegree : nextStepDegree + offset
-        const childPosition = pointAlongCircle({
-            position: {
-                x: centerX,
-                y: centerY
-            },
-            size: LEVELS_DISTANCE * levelDepth,
-            degree: childDegree
-        })
-        const midPointBetweenParentAndIteratedChild = pointAlongCircle({
-            position: {
-                x: centerX,
-                y: centerY
-            },
-            size: LEVELS_DISTANCE * (levelDepth - 0.5),
-            degree: childDegree
-        })
-        const bezierPosition = {
-            points: [
-                parentPosition.x,
-                parentPosition.y,
-                midPointBetweenParentAndFirstChild.x,
-                midPointBetweenParentAndFirstChild.y,
-                midPointBetweenParentAndIteratedChild.x,
-                midPointBetweenParentAndIteratedChild.y,
-                childPosition.x,
-                childPosition.y,
-                
-            ]
-        }
+        const { bezierPosition, childPosition, childDegree }
+            = calculateNewLevelPositioning(node, parentDegree, parentPosition, i, levelDepth)
         
         if (shouldDrawFadingOutBeziers) {
-            const edgeBezierPath = new Konva.Line({
-                strokeWidth: LINE_WIDTH,
-                opacity: LINE_OPACITY,
-                lineCap: 'round',
-                lineJoin: 'round',
-                bezier: true,
-                strokeLinearGradientStartPoint: {
-                    x: parentPosition.x,
-                    y: parentPosition.y
-                },
-                strokeLinearGradientEndPoint: {
-                    x: childPosition.x,
-                    y: childPosition.y
-                },
-                strokeLinearGradientColorStops: [
-                    0,
-                    LINE_COLOR,
-                    1,
-                    'rgba(66,71,79,0)'
-                ],
-                ...bezierPosition
-            });
+            const edgeBezierPath = createEdgeBezier(parentPosition, childPosition, bezierPosition)
             layer.add(edgeBezierPath);
             edgeBeziers.push({
                 konva: edgeBezierPath,
@@ -275,16 +213,7 @@ function drawLevel({
 
         drawAndDecorateNode(childNode, childPosition)
         
-        childNode.konva.bezier = new Konva.Line({
-            ...bezierPosition,
-            strokeWidth: LINE_WIDTH,
-            stroke: LINE_COLOR,
-            id: 'bezierLinePath',
-            opacity: LINE_OPACITY,
-            lineCap: 'round',
-            lineJoin: 'round',
-            bezier: true
-        });
+        childNode.konva.bezier = createBezier(bezierPosition)
         layer.add(childNode.konva.bezier);
         drawLevel({
             levelDepth: levelDepth + 1,
@@ -296,6 +225,58 @@ function drawLevel({
         
         layer.add(childNode.konva.circle);
         
+    }
+}
+
+function calculateNewLevelPositioning(parent, parentDegree, parentPosition, childIndex, levelDepth) {
+    const countOfChildren = parent.children.length
+    const offset = !isEven(countOfChildren) ?  - (1/10) : 0
+    const midPointBetweenParentAndFirstChild = pointAlongCircle({
+        position: {
+            x: centerX,
+            y: centerY
+        },
+        size: LEVELS_DISTANCE * (levelDepth - 0.5),
+        degree: parentDegree
+    })
+    const spreadIterator = isEven(childIndex) ? childIndex : childIndex - 1 
+    const spreadStep =
+        ((spreadIterator * CHILDREN_SPREAD_FACTOR) + 1) / (((levelDepth - 1) * LEVELS_DISTANCE) / 300)
+    const nextStepDegree = isEven(childIndex) ? parentDegree + spreadStep / 10 : parentDegree - spreadStep / 10
+    const childDegree = countOfChildren === 1 ? parentDegree : nextStepDegree + offset
+    const childPosition = pointAlongCircle({
+        position: {
+            x: centerX,
+            y: centerY
+        },
+        size: LEVELS_DISTANCE * levelDepth,
+        degree: childDegree
+    })
+    const midPointBetweenParentAndIteratedChild = pointAlongCircle({
+        position: {
+            x: centerX,
+            y: centerY
+        },
+        size: LEVELS_DISTANCE * (levelDepth - 0.5),
+        degree: childDegree
+    })
+    const bezierPosition = {
+        points: [
+            parentPosition.x,
+            parentPosition.y,
+            midPointBetweenParentAndFirstChild.x,
+            midPointBetweenParentAndFirstChild.y,
+            midPointBetweenParentAndIteratedChild.x,
+            midPointBetweenParentAndIteratedChild.y,
+            childPosition.x,
+            childPosition.y,
+            
+        ]
+    }
+    return {
+        bezierPosition,
+        childPosition,
+        childDegree
     }
 }
 
@@ -512,4 +493,42 @@ function animateNodeToNewCoordinates(node, newPosition, bezierData = null) {
             easing: Konva.Easings.EaseInOut
         })
     }
+}
+
+function createBezier(bezierPosition) {
+    return new Konva.Line({
+        ...bezierPosition,
+        strokeWidth: LINE_WIDTH,
+        stroke: LINE_COLOR,
+        id: 'bezierLinePath',
+        opacity: LINE_OPACITY,
+        lineCap: 'round',
+        lineJoin: 'round',
+        bezier: true
+    });
+}
+
+function createEdgeBezier(parentPosition, childPosition, bezierPosition) {
+    return new Konva.Line({
+        strokeWidth: LINE_WIDTH,
+        opacity: LINE_OPACITY,
+        lineCap: 'round',
+        lineJoin: 'round',
+        bezier: true,
+        strokeLinearGradientStartPoint: {
+            x: parentPosition.x,
+            y: parentPosition.y
+        },
+        strokeLinearGradientEndPoint: {
+            x: childPosition.x,
+            y: childPosition.y
+        },
+        strokeLinearGradientColorStops: [
+            0,
+            LINE_COLOR,
+            1,
+            'rgba(66,71,79,0)'
+        ],
+        ...bezierPosition
+    });
 }
