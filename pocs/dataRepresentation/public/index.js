@@ -99,7 +99,6 @@ function hideDedscendantNodes(rootNode, preserveNode) {
 
 
 function drawTree(rootNode, transitionToNewDraw = false) {
-    if (!transitionToNewDraw) edgeBeziers = []
     const circlePosition = {
         x: centerX,
         y: centerY
@@ -111,6 +110,7 @@ function drawTree(rootNode, transitionToNewDraw = false) {
         return
     }
     layer.destroyChildren()
+    edgeBeziers = []
     drawAndDecorateNode(rootNode, circlePosition)
     const rootCircle = rootNode.konva.circle
     const rootCaption = rootNode.konva.caption
@@ -440,7 +440,7 @@ function assignParents(node, parent = null) {
 
 
 function moveEdgeBeziersOfNodeToRootPositions(node) {
-    console.log(edgeBeziers)
+    console.log(edgeBeziers.map(bezier => bezier.parent.name))
     console.log(">>>moveEdgeBeziersOfNodeToRootPositions")
     const relevelantBeziers = edgeBeziers.filter(bezier => bezier.parent === node)
     relevelantBeziers.forEach((bezier, index) => {
@@ -467,11 +467,7 @@ function moveEdgeBeziersOfNodeToRootPositions(node) {
                 childPosition.y,
             ],
             duration: MOVE_DURATION,
-            easing: Konva.Easings.EaseInOut,
-            onFinish() {
-                //bezier.konva.destroy()
-                edgeBeziers = []
-            }
+            easing: Konva.Easings.EaseInOut
         })
     })
 }
