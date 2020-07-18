@@ -1,0 +1,16 @@
+{
+  "name": "datarepresentation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-dummy-data": "/bin/bash -c \"ulimit -s 65500; exec node --stack-size=65500 ./dummyDataGenerator.js\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
