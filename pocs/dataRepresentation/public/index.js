@@ -280,7 +280,11 @@ function calculateNewLevelPositioning(parent, parentDegree, parentPosition, chil
 }
 
 function handleClick(node, parentNode) {
-    return () => moveViewTo(node, parentNode)
+    return event => {
+        const isLeftButtonClicked = event.which === 1
+        if (!isLeftButtonClicked) return
+        moveViewTo(node, parentNode)
+    }
 }
 
 function moveViewTo(node, to, speed = 1) {
