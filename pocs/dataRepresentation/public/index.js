@@ -330,14 +330,10 @@ function moveViewTo(node, to, speed = 1) {
         to.y
     )
     if (!animationDistance) {
-        console.log('drawTree', node)
         drawTree(node)
         return
     }
-    
-    //drawTree(node, true)
     moveAnimation = new Konva.Animation(function (frame) {
-
         const distanceToTarget = calculateDistance(
             currentCoordinates.x,
             currentCoordinates.y,
@@ -353,7 +349,6 @@ function moveViewTo(node, to, speed = 1) {
             moveAnimation.stop()
             
             hideAncestorNodes(node, node, () => {
-                
                 const areChildrenRendered = node.children[0] && !!node.children[0].konva
                 moveEdgeBeziersOfNodeToRootPositions(node)
                 if (areChildrenRendered) drawTree(node, true)
@@ -429,13 +424,9 @@ function assignParents(node, parent = null) {
 
 
 function moveEdgeBeziersOfNodeToRootPositions(node) {
-    console.log(edgeBeziers.map(bezier => bezier.parent.name))
-    console.log(">>>moveEdgeBeziersOfNodeToRootPositions")
     const relevelantBeziers = edgeBeziers.filter(bezier => bezier.parent === node)
     relevelantBeziers.forEach((bezier, index) => {
-        console.log('animating bezier')
         const childDegree = (index / node.children.length) * Math.PI * 2
-        
         const childPosition = pointAlongCircle({
             position: {
                 x: centerX,
