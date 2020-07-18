@@ -125,7 +125,7 @@ function drawTree(rootNode, transitionToNewDraw = false) {
 
 function drawBranches(rootNode, transitionToNewDraw = false) {
     for (let i = 0 ; i < rootNode.children.length ; i++) {
-        const childrenNode = rootNode.children[i]
+        const childNode = rootNode.children[i]
         const childDegree = (i / rootNode.children.length) * Math.PI * 2
         
         const childPosition = pointAlongCircle({
@@ -148,11 +148,11 @@ function drawBranches(rootNode, transitionToNewDraw = false) {
                 childPosition.x,
                 childPosition.y,
             ]
-            animateNodeToNewCoordinates(childrenNode, childPosition, newBezierPoints)
+            animateNodeToNewCoordinates(childNode, childPosition, newBezierPoints)
             continue
         }
-        drawAndDecorateNode(childrenNode, childPosition)
-        childrenNode.konva.bezier = new Konva.Line({
+        drawAndDecorateNode(childNode, childPosition)
+        childNode.konva.bezier = new Konva.Line({
             points: [centerX, centerY, childPosition.x, childPosition.y, centerX, centerY],
             strokeWidth: LINE_WIDTH,
             stroke: LINE_COLOR,
@@ -162,14 +162,14 @@ function drawBranches(rootNode, transitionToNewDraw = false) {
           })
         drawLevel({
             levelDepth: 2,
-            node: childrenNode,
+            node: childNode,
             parentPosition: childPosition,
             parentDegree: childDegree,
             transitionToNewDraw
         })
-        layer.add(childrenNode.konva.bezier);
-        layer.add(childrenNode.konva.caption)
-        layer.add(childrenNode.konva.circle);
+        layer.add(childNode.konva.bezier);
+        layer.add(childNode.konva.caption)
+        layer.add(childNode.konva.circle);
     }
 }
 
@@ -183,7 +183,7 @@ function drawLevel({
     
     const countOfChildren = node.children.length
     const offset = !isEven(countOfChildren) ?  - (1/10) : 0
-    const centralPoint = pointAlongCircle({
+    const midPointBetweenParentAndFirstChild = pointAlongCircle({
         position: {
             x: centerX,
             y: centerY
@@ -194,36 +194,35 @@ function drawLevel({
     const shouldDrawFadingOutBeziers = levelDepth === MAX_LEVEL_DEPTH + 1
     for (let i = 0 ; i < countOfChildren ; i++) {
         const childNode = node.children[i]
-
         const spreadIterator = isEven(i) ? i : i - 1 
         const spreadStep =
             ((spreadIterator * CHILDREN_SPREAD_FACTOR) + 1) / (((levelDepth - 1) * LEVELS_DISTANCE) / 300)
         const nextStepDegree = isEven(i) ? parentDegree + spreadStep / 10 : parentDegree - spreadStep / 10
-        const degree = countOfChildren === 1 ? parentDegree : nextStepDegree + offset
+        const childDegree = countOfChildren === 1 ? parentDegree : nextStepDegree + offset
         const childPosition = pointAlongCircle({
             position: {
                 x: centerX,
                 y: centerY
             },
             size: LEVELS_DISTANCE * levelDepth,
-            degree
+            degree: childDegree
         })
-        const childCentralPoint = pointAlongCircle({
+        const midPointBetweenParentAndIteratedChild = pointAlongCircle({
             position: {
                 x: centerX,
                 y: centerY
             },
             size: LEVELS_DISTANCE * (levelDepth - 0.5),
-            degree: countOfChildren === 1 ? parentDegree : nextStepDegree + offset
+            degree: childDegree
         })
         const bezierPosition = {
             points: [
                 parentPosition.x,
                 parentPosition.y,
-                centralPoint.x,
-                centralPoint.y,
-                childCentralPoint.x,
-                childCentralPoint.y,
+                midPointBetweenParentAndFirstChild.x,
+                midPointBetweenParentAndFirstChild.y,
+                midPointBetweenParentAndIteratedChild.x,
+                midPointBetweenParentAndIteratedChild.y,
                 childPosition.x,
                 childPosition.y,
                 
@@ -231,9 +230,8 @@ function drawLevel({
         }
         
         if (shouldDrawFadingOutBeziers) {
-            const bezierLinePath = new Konva.Line({
+            const edgeBezierPath = new Konva.Line({
                 strokeWidth: LINE_WIDTH,
-                id: 'bezierLinePath',
                 opacity: LINE_OPACITY,
                 lineCap: 'round',
                 lineJoin: 'round',
@@ -252,20 +250,11 @@ function drawLevel({
                     1,
                     'rgba(66,71,79,0)'
                 ],
-                points: [
-                    parentPosition.x,
-                    parentPosition.y,
-                    centralPoint.x,
-                    centralPoint.y,
-                    childCentralPoint.x,
-                    childCentralPoint.y,
-                    childPosition.x,
-                    childPosition.y,
-                ],
+                ...bezierPosition
             });
-            layer.add(bezierLinePath);
+            layer.add(edgeBezierPath);
             edgeBeziers.push({
-                konva: bezierLinePath,
+                konva: edgeBezierPath,
                 parent: node
             })
             
@@ -278,7 +267,7 @@ function drawLevel({
                 levelDepth: levelDepth + 1,
                 node: childNode,
                 parentPosition: childPosition,
-                parentDegree: degree,
+                parentDegree: childDegree,
                 transitionToNewDraw
             })
             continue
@@ -301,7 +290,7 @@ function drawLevel({
             levelDepth: levelDepth + 1,
             node: childNode,
             parentPosition: childPosition,
-            parentDegree: degree
+            parentDegree: childDegree
         })
         layer.add(childNode.konva.caption)
         
