@@ -43,6 +43,7 @@ let animationTarget = null
 let animationDistance = null
 let knowledgeNetwork = null
 let edgeBeziers = []
+let isTransitionOngoing = false
 
 fetch('./knowledgeNetwork.json')
     .then(response => response.json())
@@ -283,6 +284,8 @@ function handleClick(node, parentNode) {
 }
 
 function moveViewTo(node, to, speed = 1) {
+    if (isTransitionOngoing) return
+    isTransitionOngoing = true
     edgeBeziers.forEach(bezier => {
         if (bezier.parent !== node) {
             bezier.konva.to({
@@ -310,6 +313,7 @@ function moveViewTo(node, to, speed = 1) {
     )
     if (!animationDistance) {
         drawTree(node)
+        isTransitionOngoing = false
         return
     }
     moveAnimation = new Konva.Animation(function (frame) {
@@ -359,8 +363,8 @@ function moveViewTo(node, to, speed = 1) {
                 })
                 setTimeout(() => {
                     drawTree(node)
+                    isTransitionOngoing = false
                 }, MOVE_DURATION * 1000)
-                   
             })
             return
         }
