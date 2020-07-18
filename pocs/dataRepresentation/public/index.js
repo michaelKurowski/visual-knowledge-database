@@ -62,12 +62,12 @@ function hideAncestorNodes(rootNode, preserveNode, cb) {
             onFinish: cb
         })
     }
-    hideDedscendantNodes(rootNode, preserveNode)
+    hideDescendentNodes(rootNode, preserveNode)
     if (!rootNode.parent) return
     hideAncestorNodes(rootNode.parent, preserveNode)
 }
 
-function hideDedscendantNodes(rootNode, preserveNode) {
+function hideDescendentNodes(rootNode, preserveNode) {
     if (preserveNode.name === rootNode.name) return
     if (!rootNode.konva) return
     rootNode.konva.circle.to({
@@ -94,7 +94,7 @@ function hideDedscendantNodes(rootNode, preserveNode) {
         })
     }
 
-    rootNode.children.forEach(child => hideDedscendantNodes(child, preserveNode))
+    rootNode.children.forEach(child => hideDescendentNodes(child, preserveNode))
 }
 
 
@@ -222,9 +222,7 @@ function drawLevel({
             parentDegree: childDegree
         })
         layer.add(childNode.konva.caption)
-        
         layer.add(childNode.konva.circle);
-        
     }
 }
 
