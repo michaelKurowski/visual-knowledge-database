@@ -1,5 +1,8 @@
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+const FacebookStrategy = require('passport-facebook').Strategy
+const TwitterStrategy = require('passport-twitter').Strategy
+const GithubStrategy = require('passport-github2').Strategy
 const GoogleUser = require('../db/schema/googleUser')
 
 passport.use(new GoogleStrategy({
@@ -18,6 +21,30 @@ passport.use(new GoogleStrategy({
             })
         }
     })
+}))
+
+passport.use(new FacebookStrategy({
+    clientID: '',
+    clientSecret: '',
+    callbackURL: ''
+}, (accessToken, refreshToken, profile, done) => {
+    //Create new user or login
+}))
+
+passport.use(new TwitterStrategy({
+    consumerKey: '',
+    consumerSecret: '',
+    callbackURL: ''
+}, (accessToken, refreshToken, profile, done) => {
+    //Create new user or login
+}))
+
+passport.use(new GithubStrategy({
+    clientID: '',
+    clientSecret: '',
+    callbackURL: ''
+}, (accessToken, refreshToken, profile, done) => {
+    //Create new user or register
 }))
 
 passport.serializeUser((user, done) => {
