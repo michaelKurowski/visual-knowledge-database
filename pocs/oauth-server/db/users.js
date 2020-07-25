@@ -1,4 +1,4 @@
-module.exports = (UserModel = require('./schema/googleUser')) => {
+module.exports = (UserModel = require('./schema/user')) => {
     return {
         getUserById(id) {
             return UserModel.findById(id).exec()

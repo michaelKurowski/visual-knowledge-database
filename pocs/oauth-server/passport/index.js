@@ -3,18 +3,18 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 const FacebookStrategy = require('passport-facebook').Strategy
 const TwitterStrategy = require('passport-twitter').Strategy
 const GithubStrategy = require('passport-github2').Strategy
-const GoogleUser = require('../db/schema/googleUser')
+const User = require('../db/schema/user')
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: '/auth/google/redirect'
 }, (accessToken, refreshToken, profile, done) => {
-    GoogleUser.findOne({googleId: profile.id}).then((currentUser) => {
+    User.findOne({id: profile.id}).then((currentUser) => {
         if(currentUser){
             done(null, currentUser)
         } else {
-            new GoogleUser({googleId: profile.id, token: accessToken, consent: true})
+            new User({id: profile.id})
             .save()
             .then((newUser) => {
                 done(null, newUser)
@@ -52,7 +52,7 @@ passport.serializeUser((user, done) => {
 })
 
 passport.deserializeUser((id, done) => {
-    GoogleUser.findById(id).then(user => {
+    User.findById(id).then(user => {
         done(null, user)
     })
 })
