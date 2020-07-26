@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <top-bar />
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
@@ -7,7 +8,14 @@
     <router-view/>
   </div>
 </template>
-
+<script>
+import TopBar from './components/shared/TopBar/TopBar.vue'
+export default {
+  components: {
+    TopBar
+  }
+}
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

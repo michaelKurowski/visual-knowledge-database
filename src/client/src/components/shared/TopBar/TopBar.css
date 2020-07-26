@@ -1,0 +1,23 @@
+.top-bar {
+    position: fixed;
+    right: 0px;
+    width: 10em;
+    user-select: none;
+    cursor: pointer;
+}
+
+.header {
+    width: 10em;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    @apply bg-primary p-2 font-bold ;
+}
+
+.tab {
+    width: 10em;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    @apply bg-primary p-2;
+}
+
+.last-tab {
+    border-bottom-left-radius: 10px;
+}

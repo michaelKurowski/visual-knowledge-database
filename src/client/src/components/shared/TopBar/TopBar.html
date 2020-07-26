@@ -1,0 +1,14 @@
+<div class='top-bar'>
+    <div class='header' @click='toggle()'>
+        Navigation
+    </div>
+    <nav v-if='dropped'>
+        <ol  @click='toggle()'>
+            <router-link to="/tree"><li class='tab'>Tree</li></router-link>
+            <router-link to="/edit-mode"><li class='tab'>Edit mode</li></router-link>
+            <router-link to="/profile"><li class='tab'>Profile</li></router-link>
+            <router-link to="/about"><li class='tab'>About</li></router-link>
+            <li class='tab last-tab'>Log out</li>
+        </ol>
+    </nav>
+</div>

@@ -1,1 +1,3 @@
-Edit page
+<template>
+    <span>Edit page</span>
+</template>
