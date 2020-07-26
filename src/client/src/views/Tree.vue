@@ -1,1 +1,3 @@
-Tree view page
+<template>
+    <span>Tree</span>
+</template>

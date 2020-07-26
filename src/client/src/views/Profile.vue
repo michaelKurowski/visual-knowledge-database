@@ -1,1 +1,3 @@
-Profile view
+<template>
+    <span>Profile</span>
+</template>

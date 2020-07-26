@@ -1,1 +1,3 @@
-Login page
+<template>
+    <span>Login </span>
+</template>

@@ -1,1 +1,3 @@
-Sign up page
+<template>
+    <span>Registration</span>
+</template>
