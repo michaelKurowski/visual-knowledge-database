@@ -1,15 +1,15 @@
 function getAncestors(req, res) {
-    const { id, classification } = req.query
+    const { nodeId, classificationId } = req.query
     res.send('a')
 }
 
 function getDescendants(req, res) {
-    const { id, classification } = req.query
+    const { nodeId, classificationId } = req.query
     res.send('d')
 }
 
 function getTreeRoot(req, res) {
-    const { classification } = req.query
+    const { classificationId } = req.query
     res.send('t') 
 }
 
