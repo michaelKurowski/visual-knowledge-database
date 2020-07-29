@@ -8,13 +8,18 @@ Backend for visual knowledge database
 
 ## GET
 `/ancestors`
+
 **Params**
  - `id` - node id
  - `classification` - classification ID to search ancestors by
 
 `/descendants`
+
+**Params**
  - `id` - node id
  - `classification` - classification ID to search descendants by
 
 `/tree-root`
+
+**Params**
  - `classification` - classification ID to search ancestors of the tree root by
