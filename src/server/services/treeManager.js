@@ -9,6 +9,7 @@ const tree = require('../dummyData/knowledgeNetwork.json')
 class DummyTreeManager {
     constructor() {
         this.tree = DummyTreeManager.flattenKnowledgeTree(tree)
+        this.root = tree
         this.convertReferencesToId()
     }
 
@@ -18,6 +19,7 @@ class DummyTreeManager {
 
     static getAncestors(tree, node, levelsOfAncestors) {
         if (levelsOfAncestors === 0) return [node]
+        if (!node) return []
         return [
             node,
             ...DummyTreeManager.getAncestors(
@@ -30,6 +32,8 @@ class DummyTreeManager {
 
     static getDescendants(tree, node, levelsOfDescendants) {
         if (levelsOfDescendants === 0) return [node]
+        if (!node) return []
+        if (!node.children) return []
         return [
             node,
             ...node.children.flatMap(child => {
@@ -48,7 +52,6 @@ class DummyTreeManager {
     }
 
     static flattenKnowledgeTree(node) {
-        const newNode = node
         return [
             node,
             ...node.children.flatMap(child => DummyTreeManager.flattenKnowledgeTree(child))
