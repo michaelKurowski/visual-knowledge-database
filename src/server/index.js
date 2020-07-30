@@ -15,5 +15,5 @@ app.listen(PORT, () => {
 })
 
 var dtm = new DTM()
-console.log(DTM.getNode(dtm.tree, '1MdidEt6CDyb6NBjgx1S'))
-console.log(DTM.getAncestors(dtm.tree, DTM.getNode(dtm.tree, '1MdidEt6CDyb6NBjgx1S'), 2))
+console.log(DTM.getNode(dtm.tree, 'tjgWwZIS2eYnN2brljyf'))
+console.log(DTM.getAncestors(dtm.tree, DTM.getNode(dtm.tree, 'tjgWwZIS2eYnN2brljyf'), 2))

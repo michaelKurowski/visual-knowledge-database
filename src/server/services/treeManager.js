@@ -20,13 +20,25 @@ class DummyTreeManager {
         if (levelsOfAncestors === 0) return [node]
         return [
             node,
+            ...DummyTreeManager.getAncestors(
+                tree,
+                tree.find(child => child.children.indexOf(node.name) !== -1),
+                levelsOfAncestors - 1
+            )
+        ]
+    }
+
+    static getDescendants(tree, node, levelsOfDescendants) {
+        if (levelsOfDescendants === 0) return [node]
+        return [
+            node,
             ...node.children.flatMap(child => {
                 const childObject = DummyTreeManager.getNode(tree, child)
                 return [
-                    ...DummyTreeManager.getAncestors(
+                    ...DummyTreeManager.getDescendants(
                         tree,
                         childObject,
-                        levelsOfAncestors - 1
+                        levelsOfDescendants - 1
                     )
                 ]
             }
