@@ -1,10 +1,17 @@
 const TreeManager = require('../services/treeManager')
 const logger = require('../logger').logRoute
-
+const classifications = require('../dummyData/classifications.json')
 
 const SEARCH_DEPTH = 2
 const treeManager = new TreeManager()
 
+function decorateDummyDataWithClassificationId(nodesList) {
+    return nodesList.map(node => {
+        const newNode = {...node}
+        newNode.children = node.children.map(child => ({nodeId: child, classificationId: classifications[0].code}))
+        return newNode
+    })
+}
 
 function getAncestors(req, res) {
     const { nodeId, classificationId } = req.query
@@ -17,7 +24,10 @@ function getAncestors(req, res) {
     const ancestorChildrenWithoutDuplicates = [...new Set(ancestorChildren)]
     res.send({
         message: 'OK',
-        nodes: ancestorChildrenWithoutDuplicates
+        nodes: decorateDummyDataWithClassificationId(
+            ancestorChildrenWithoutDuplicates
+        )
+            
     })
 }
 
@@ -28,7 +38,9 @@ function getDescendants(req, res) {
     const descendats = TreeManager.getDescendants(treeManager.tree, startingNode, SEARCH_DEPTH)
     res.send({
         message: 'OK',
-        nodes: descendats
+        nodes: decorateDummyDataWithClassificationId(
+            descendats
+        )
     })
 }
 
@@ -36,7 +48,9 @@ function getTreeRoot(req, res) {
     const { classificationId } = req.query
     res.send({
         message: 'OK',
-        nodes: TreeManager.getDescendants(treeManager.tree, treeManager.root, SEARCH_DEPTH)
+        nodes: decorateDummyDataWithClassificationId(
+            TreeManager.getDescendants(treeManager.tree, treeManager.root, SEARCH_DEPTH)
+        )
     }) 
 }
 
