@@ -67,4 +67,7 @@ class DummyTreeManager {
 }
 
 
-module.exports = DummyTreeManager
+module.exports = {
+    treeManager: new DummyTreeManager(),
+    TreeManager: DummyTreeManager
+}

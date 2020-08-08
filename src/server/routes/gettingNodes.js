@@ -1,9 +1,8 @@
-const TreeManager = require('../services/treeManager')
+const { treeManager, TreeManager } = require('../services/treeManager')
 const logger = require('../logger').logRoute
 const classifications = require('../dummyData/classifications.json')
 
 const SEARCH_DEPTH = 2
-const treeManager = new TreeManager()
 
 function decorateDummyDataWithClassificationId(nodesList) {
     return nodesList.map(node => {
