@@ -23,6 +23,15 @@ function createSourceObject({url, thumbnail = null, description = null, type = n
         type,
     }
 }
+
+function editNode(oldNode, newNode) {
+    return {
+        ...oldNode,
+        ...newNode,
+        ...{ id: oldNode.id }
+    }
+}
+
 function createNode({id, name, description = null, thumbnail = null, sources = [], children = []}) {
     if (!id || !name) {
         console.error({
@@ -43,4 +52,8 @@ function createNode({id, name, description = null, thumbnail = null, sources = [
         sources,
         children
     }
+}
+
+module.exports = {
+    editNode
 }

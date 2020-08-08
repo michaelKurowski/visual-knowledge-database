@@ -5,7 +5,7 @@
 
 
 const tree = require('../dummyData/knowledgeNetwork.json')
-
+const { editNode } = require('./objectCreators')
 class DummyTreeManager {
     constructor() {
         this.tree = DummyTreeManager.flattenKnowledgeTree(tree)
@@ -15,6 +15,20 @@ class DummyTreeManager {
 
     static getNode(tree, id) {
         return tree.find(node => node.name === id)
+    }
+
+    static editNode(tree, id, nodeDelta) {
+        const node = DummyTreeManager.getNode(tree, id)
+        const nodeIndex = tree.indexOf(node)
+        tree[nodeIndex] = editNode(node, nodeDelta) 
+    }
+
+    static deleteNode(treeManager, id) {
+        console.log('deleteNode', id)
+       treeManager.tree = treeManager.tree.filter(node => node.name !== id)
+       treeManager.tree.forEach(node => {
+           node.children = node.children.filter(child => child !== id)
+       })
     }
 
     static getAncestors(tree, node, levelsOfAncestors) {
