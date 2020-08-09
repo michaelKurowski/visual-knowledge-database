@@ -9,6 +9,9 @@ export default {
     created() {
         this.fetchTreeRoot({classificationId: 'BRANCHES'})
     },
+    mounted() {
+
+    },
     methods: {
         ...mapActions({
             fetchTreeRoot: 'tree/fetchTreeRoot'
