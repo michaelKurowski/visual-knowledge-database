@@ -5,8 +5,6 @@ const cors = require('cors')
 
 const PORT = 8000
 
-
-
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())

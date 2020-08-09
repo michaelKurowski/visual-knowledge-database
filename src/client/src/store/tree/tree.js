@@ -1,6 +1,6 @@
 import config from '@/config.json'
 
-const serverHostPart = `${config.backend.protocol}://${config.backend.host}`
+const serverHostPart = `${config.backend.protocol}://${config.backend.host}:${config.backend.port}`
 
 export default {
   namespaced: true,
@@ -18,26 +18,31 @@ export default {
       fetchDescendants({ commit }, { nodeId, classificationId }) {
         const baseUrl = `${serverHostPart}${config.backend.endpoints.getDescendants}`
         return fetch(`${baseUrl}?nodeId=${nodeId}&classificationId=${classificationId}`)
+            .then(response => response.json)
             .then(response => {
-                commit('addNodes', response.nodes)
+                commit('addNodes', response.nodes())
             })
       },
       fetchAncestors({ commit }, { nodeId, classificationId }) {
         const baseUrl = `${serverHostPart}${config.backend.endpoints.getAncestors}`
         return fetch(`${baseUrl}?nodeId=${nodeId}&classificationId=${classificationId}`)
+            .then(response => response.json)
             .then(response => {
-                commit('addNodes', response.nodes)
+                commit('addNodes', response.nodes())
             })
       },
       fetchTreeRoot({ commit }, { classificationId }) {
         const baseUrl = `${serverHostPart}${config.backend.endpoints.getRoot}`
         return fetch(`${baseUrl}?classificationId=${classificationId}`)
+            .then(response => response.json())
             .then(response => {
                 commit('addNodes', response.nodes)
             })
       }
   },
   getters: {
-
+    nodesList(state) {
+        return state.nodesList
+    }
   }
 }
