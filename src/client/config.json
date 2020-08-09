@@ -1,0 +1,12 @@
+{
+  "backend": {
+    "host": "localhost",
+    "port": 8000,
+    "protocol": "http",
+    "endpoints": {
+      "getDescendants": "/get-descendants",
+      "getAncestors": "/get-ancestors",
+      "getRoot": "/tree-root"
+    }
+  }
+}
