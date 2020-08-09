@@ -10,17 +10,31 @@ export default {
       }
   },
   mutations: {
+      addNodes(state, listOfNodes) {
+        state.nodesList.push(listOfNodes)
+      }
   },
   actions: {
       fetchDescendants({ commit }, { nodeId, classificationId }) {
         const baseUrl = `${serverHostPart}${config.backend.endpoints.getDescendants}`
         return fetch(`${baseUrl}?nodeId=${nodeId}&classificationId=${classificationId}`)
+            .then(response => {
+                commit('addNodes', response.nodes)
+            })
       },
-      fetchAncestors() {
-
+      fetchAncestors({ commit }, { nodeId, classificationId }) {
+        const baseUrl = `${serverHostPart}${config.backend.endpoints.getAncestors}`
+        return fetch(`${baseUrl}?nodeId=${nodeId}&classificationId=${classificationId}`)
+            .then(response => {
+                commit('addNodes', response.nodes)
+            })
       },
-      fetchTreeRoot() {
-
+      fetchTreeRoot({ commit }, { classificationId }) {
+        const baseUrl = `${serverHostPart}${config.backend.endpoints.getRoot}`
+        return fetch(`${baseUrl}?classificationId=${classificationId}`)
+            .then(response => {
+                commit('addNodes', response.nodes)
+            })
       }
   },
   getters: {
