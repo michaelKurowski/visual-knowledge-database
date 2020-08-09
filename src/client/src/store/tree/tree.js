@@ -1,6 +1,6 @@
-import config from '@config'
+import config from '@/config.json'
 
-const serverHostPart = `${config.server.protocol}://${config.server.host}`
+const serverHostPart = `${config.backend.protocol}://${config.backend.host}`
 
 export default {
   namespaced: true,
@@ -13,7 +13,7 @@ export default {
   },
   actions: {
       fetchDescendants({ commit }, { nodeId, classificationId }) {
-        const baseUrl = `${serverHostPart}${config.server.endpoints.getDescendants}`
+        const baseUrl = `${serverHostPart}${config.backend.endpoints.getDescendants}`
         return fetch(`${baseUrl}?nodeId=${nodeId}&classificationId=${classificationId}`)
       },
       fetchAncestors() {
