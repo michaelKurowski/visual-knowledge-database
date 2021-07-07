@@ -3,16 +3,14 @@ const mongoose = require('mongoose')
 const dbConnection = require('../db/dbConnectionProvider')
 
 const DUMMY_DATA = {
-    googleId: '12345',
-    email: 'testy mctestyface',
-    token: 'super special token'
+    id: '12345'
 }
 
 describe('User', function() {
     before(function(done) {
         db = mongoose.createConnection('mongodb://tester:dupadupa12345@ds361488.mlab.com:61488/testdb1', {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true})
         dbConnection.setDbConnection(db)
-        GoogleUser = require('../db/schema/googleUser')
+        User = require('../db/schema/user')
         done()
     })
     after(function(done) {
@@ -20,11 +18,7 @@ describe('User', function() {
         done()
     })
     beforeEach(done => {
-        let user = new GoogleUser({
-            googleId: '12345',
-            email: 'testy mctestyface',
-            token: 'super special token'
-        })
+        let user = new User({id: '12345'})
 
         user.save(function(error) {
             if(error) console.log('error' + error.message)
@@ -34,14 +28,14 @@ describe('User', function() {
     })
 
     afterEach(done => {
-        GoogleUser.remove({}, () => {
+        User.remove({}, () => {
             done()
         })
     })
     it('Find a user by username', (done) => {
-        GoogleUser.findOne(DUMMY_DATA, (err, user) => {
+        User.findOne(DUMMY_DATA, (err, user) => {
             user.email.should.eql('testy mctestyface')
-            user.googleId.should.eql('12345')
+            user.id.should.eql('12345')
             done()
         })
     })

@@ -15,5 +15,6 @@ app.use(express.static('public'))
 
 //Use OAuth routes
 app.use('/', require('./routes/oauth'))
+app.use('/account', require('./routes/account'))
 
 app.listen(PORT, () => console.log('Server is listening on:', PORT))
